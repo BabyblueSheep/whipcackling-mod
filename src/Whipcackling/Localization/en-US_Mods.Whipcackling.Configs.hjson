@@ -1,0 +1,36 @@
+WhipcacklingConfig: {
+	DisplayName: Whipcackling Configuration
+	Headers.CalamityChanges: "[i:CalamityMod/Calamity] Calamity Changes"
+
+	RemoveSummonerPenalty: {
+		Label: "[i:SlimeStaff]  Remove Summoner Penalty"
+		Tooltip: Removes the 25% summon damage penalty incurred on players whilst holding a non-summoner weapon.
+	}
+
+	RemoveMultiplicativeTagDamage: {
+		Label: "[i:BlandWhip]  Remove Multiplicative Tag Damage"
+		Tooltip:
+			'''
+			Reverts the multiplicative tag damage change.
+			Only affects whips modified by Calamity (only vanilla whips so far).
+			'''
+	}
+
+	BalanceMode: {
+		Label: "[i:CalamityMod/StatMeter] Weapon Stat Balancing"
+		Tooltip:
+			'''
+			Dictates which stat values will be used for summon weapons.
+			[c/ff6969:Whipcackling]: values changed in Whipcackling.
+			[c/ff6969:Calamity]: values changed in Calamity (and Catalyst, if it's enabled).
+			[c/ff6969:Vanilla]: values present in Terraria, without any modifications.
+			'''
+	}
+}
+
+BalanceMode: {
+	Tooltip: ""
+	Whipcackling.Label: Whipcackling
+	Calamity.Label: Calamity
+	Vanilla.Label: Vanilla
+}

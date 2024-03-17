@@ -6,10 +6,17 @@
         <TargetFramework>net6.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<OverrideTMLBuildTask>true</OverrideTMLBuildTask>
         <Nullable>enable</Nullable>
         <RootNamespace>Whipcackling</RootNamespace>
 
         <AssemblyPublicizerPaths>$(AssemblyPublicizerPaths);$(MSBuildThisFileDirectory)whipcackling.publicizer.js</AssemblyPublicizerPaths>
     </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="CalamityMod">
+        <HintPath>lib\CalamityMod.dll</HintPath>
+      </Reference>
+    </ItemGroup>
 
 </Project>

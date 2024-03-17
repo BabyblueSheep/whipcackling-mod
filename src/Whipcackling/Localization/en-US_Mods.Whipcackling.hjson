@@ -1,1 +1,24 @@
+Cooldowns.MeldWhipCooldown: Black Hole Tag Cooldown
 
+Buffs: {
+	MeldWhipNPCDebuff: {
+		DisplayName: Meld Whip N P C Debuff
+		Description: Mods.Whipcackling.Buffs.MeldWhipNPCDebuff.Description
+	}
+
+	MeldWhipNPCDebuffSuper: {
+		DisplayName: Meld Whip N P C Debuff Super
+		Description: Mods.Whipcackling.Buffs.MeldWhipNPCDebuffSuper.Description
+	}
+
+	NuclearWhipNPCDebuff: {
+		DisplayName: Nuclear Whip N P C Debuff
+		Description: Mods.Whipcackling.Buffs.NuclearWhipNPCDebuff.Description
+	}
+}
+
+Projectiles: {
+	MeldExplosion.DisplayName: Meld Explosion
+	MeldWhipProjectile.DisplayName: Meld Whip Projectile
+	NuclearWhipProjectile.DisplayName: Nuclear Whip Projectile
+}

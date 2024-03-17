@@ -1,3 +1,8 @@
-displayName = Whipcackling
-author = Me
-version = 1.0.0
+displayName = Whipcackling: Calamity Addon
+author = babybluesheep & Split
+version = 0.1
+modReferences = CalamityMod
+hideCode = false
+hideResources = false
+includeSource = true
+buildIgnore = .vs\*, bin\*, lib\*, obj\*, *.csproj, *.user, Assets\Effects\Compiler\*
