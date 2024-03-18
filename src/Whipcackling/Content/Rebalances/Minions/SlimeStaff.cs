@@ -24,12 +24,12 @@ namespace Whipcackling.Content.Rebalances.Minions
 
         public override void SetDefaults(Projectile entity)
         {
-            if (WhipcacklingConfig.Instance.BalanceMode == BalanceMode.Default)
+            if (WhipcacklingConfig.Instance.BalanceMode == BalanceMode.Whipcackling)
             {
                 entity.usesIDStaticNPCImmunity = false;
                 entity.idStaticNPCHitCooldown = -1;
                 entity.usesLocalNPCImmunity = true;
-                entity.localNPCHitCooldown = 18;
+                entity.localNPCHitCooldown = 15;
             }
         }
     }
