@@ -10,6 +10,7 @@ namespace Whipcackling.Common.Configs
     {
         Whipcackling,
         Calamity,
-        Vanilla
+        Vanilla,
+        Default
     }
 }

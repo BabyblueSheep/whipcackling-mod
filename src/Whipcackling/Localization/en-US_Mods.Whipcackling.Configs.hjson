@@ -21,9 +21,11 @@ WhipcacklingConfig: {
 		Tooltip:
 			'''
 			Dictates which stat values will be used for summon weapons.
-			[c/ff6969:Whipcackling]: values changed in Whipcackling.
-			[c/ff6969:Calamity]: values changed in Calamity (and Catalyst, if it's enabled).
+			[c/ff6969:Whipcackling]: values changed by Whipcackling.
+			[c/ff6969:Calamity]: values changed by Calamity (and Catalyst, if it's enabled).
 			[c/ff6969:Vanilla]: values present in Terraria, without any modifications.
+			[c/ff6969:Default]: values changed by Calamity or other mods.
+			This also affects whip tag damage values and certain values in minion projectiles.
 			'''
 	}
 }
@@ -33,4 +35,5 @@ BalanceMode: {
 	Whipcackling.Label: Whipcackling
 	Calamity.Label: Calamity
 	Vanilla.Label: Vanilla
+	Default.Label: Default
 }

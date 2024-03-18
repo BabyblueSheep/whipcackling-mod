@@ -70,14 +70,14 @@ namespace Whipcackling.Core.Particles
         /// <param name="particle">The particle instance.</param>
         /// /// <param name="lightColor">The color at the particle's position.</param>
         /// <returns>The overidden color.</returns>
-        public virtual Color GetColor(Particle particle, Color lightColor) => new Color(particle.Color.R * lightColor.R / 255, particle.Color.G * lightColor.G / 255, particle.Color.B * lightColor.B / 255, particle.Color.A);
+        public virtual Color GetColor(Particle particle, Color lightColor) => new(particle.Color.R * lightColor.R / 255, particle.Color.G * lightColor.G / 255, particle.Color.B * lightColor.B / 255, particle.Color.A);
 
         /// <summary>
         /// Allows you to set the texture frame of a particle. Used for multi-frame textures.
         /// </summary>
         /// <param name="particle">The particle instance.</param>
         /// <returns>The texture frame.</returns>
-        public virtual Rectangle GetFrame(Particle particle) => new Rectangle(0, ModContent.Request<Texture2D>(Texture).Height() * particle.Variant / Variants, ModContent.Request<Texture2D>(Texture).Width(), ModContent.Request<Texture2D>(Texture).Height() / Variants);
+        public virtual Rectangle GetFrame(Particle particle) => new(0, ModContent.Request<Texture2D>(Texture).Height() * particle.Variant / Variants, ModContent.Request<Texture2D>(Texture).Width(), ModContent.Request<Texture2D>(Texture).Height() / Variants);
 
 
         /// <summary>

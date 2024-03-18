@@ -3,6 +3,7 @@ using CalamityMod.Items;
 using CalamityMod.Items.Weapons.Summon;
 using CalamityMod.NPCs.AcidRain;
 using CalamityMod.Rarities;
+using CalamityMod.UI;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ using Terraria.ModLoader;
 using Whipcackling.Common;
 using Whipcackling.Content.Rebalances;
 using Whipcackling.Content.Whips.MeldWhip;
+using static CalamityMod.Items.CalamityGlobalItem;
 
 namespace Whipcackling.Content.Whips.NuclearWhip
 {
@@ -30,12 +32,6 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
             Item.autoReuse = true;
 
-        }
-
-        public override bool Shoot(Player player, EntitySource_ItemUse_WithAmmo source, Vector2 position, Vector2 velocity, int type, int damage, float knockback)
-        {
-            Main.NewText($"{RebalanceSystem.VanillaStats[ItemID.Smolstar]} {RebalanceSystem.CalamityStats[ItemID.Smolstar]}");
-            return base.Shoot(player, source, position, velocity, type, damage, knockback);
         }
 
         public override bool MeleePrefix()

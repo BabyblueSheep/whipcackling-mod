@@ -20,6 +20,7 @@ namespace Whipcackling.Common.Configs
         [BackgroundColor(192, 54, 64, 192)]
         [DefaultValue(BalanceMode.Whipcackling)]
         [DrawTicks]
+        [ReloadRequired]
         public BalanceMode BalanceMode { get; set; }
 
         [BackgroundColor(192, 54, 64, 192)]

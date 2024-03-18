@@ -4,13 +4,15 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <LangVersion>latest</LangVersion>
+        <LangVersion>10</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<OverrideTMLBuildTask>true</OverrideTMLBuildTask>
         <Nullable>enable</Nullable>
         <RootNamespace>Whipcackling</RootNamespace>
 
         <AssemblyPublicizerPaths>$(AssemblyPublicizerPaths);$(MSBuildThisFileDirectory)whipcackling.publicizer.js</AssemblyPublicizerPaths>
+
+        <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
     </PropertyGroup>
 
     <ItemGroup>

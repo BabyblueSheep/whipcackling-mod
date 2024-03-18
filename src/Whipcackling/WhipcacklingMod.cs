@@ -19,11 +19,6 @@ namespace Whipcackling
             CooldownRegistry.RegisterModCooldowns(this);
         }
 
-        public override void Unload()
-        {
-            ParticleLoader.Unload();
-        }
-
         public override void PostSetupContent()
         {
             if (Main.netMode == NetmodeID.Server)

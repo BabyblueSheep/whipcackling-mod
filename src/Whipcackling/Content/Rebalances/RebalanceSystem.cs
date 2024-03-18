@@ -9,28 +9,18 @@ using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
+using Terraria.ModLoader.Default.Patreon;
+using static CalamityMod.Items.CalamityGlobalItem;
 
 namespace Whipcackling.Content.Rebalances
 {
     public class RebalanceSystem : ModSystem
     {
-        public static SortedDictionary<int, WeaponStats> VanillaStats;
-        public static SortedDictionary<int, WeaponStats> CalamityStats;
+        public static SortedDictionary<int, WeaponStats> VanillaStats = new();
+        public static SortedDictionary<int, WeaponStats> CalamityStats = new();
 
         public override void PostSetupContent()
         {
-            foreach (MethodInfo method in  typeof(CalamityGlobalItem).GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)) 
-            {
-                Mod.Logger.Info($"{method.Name}");
-            }
-
-            MethodInfo applyTweaksInfo = typeof(CalamityGlobalItem).GetMethod("SetDefaults_ApplyTweaks", BindingFlags.NonPublic | BindingFlags.Static);
-            //Mod.Logger.Info(applyTweaksInfo);
-            var SetDefaults_ApplyTweaks = (Action<Item>)Delegate.CreateDelegate(typeof(Action<Item>), applyTweaksInfo, true);
-
-            VanillaStats = new();
-            CalamityStats = new();
-
             for (int i = 0; i < ItemLoader.ItemCount; i++)
             {
                 Item item = new();
@@ -42,30 +32,43 @@ namespace Whipcackling.Content.Rebalances
                     item.SetDefaults3(i);
                 else if (i <= 3989)
                     item.SetDefaults4(i);
-                else if (i <= ItemID.Count)
+                else if (i <= 5456)
                     item.SetDefaults5(i);
                 else
-                    item.SetDefaults(i);
+                    ItemLoader.GetItem(i).NewInstance(item);
                 if (!item.CountsAsClass(DamageClass.Summon))
                     continue;
 
-                WeaponStats stats = new();
-                stats.Damage = item.damage;
-                stats.Knockback = item.knockBack;
-                stats.Mana = item.mana;
-                stats.UseTime = item.useTime;
-                stats.UseAnimation = item.useAnimation;
-                stats.Velocity = item.shootSpeed;
+                WeaponStats stats = new()
+                {
+                    Damage = item.damage,
+                    Knockback = item.knockBack,
+                    Mana = item.mana,
+                    UseTime = item.useTime,
+                    UseAnimation = item.useAnimation,
+                    Velocity = item.shootSpeed
+                };
                 VanillaStats.Add(i, stats);
 
-                SetDefaults_ApplyTweaks(item);
-                WeaponStats calStats = new();
-                calStats.Damage = item.damage;
-                calStats.Knockback = item.knockBack;
-                calStats.Mana = item.mana;
-                calStats.UseTime = item.useTime;
-                calStats.UseAnimation = item.useAnimation;
-                calStats.Velocity = item.shootSpeed;
+                bool needsTweaking = currentTweaks.TryGetValue(i, out IItemTweak[] tweaks);
+                if (!needsTweaking)
+                {
+                    CalamityStats.Add(i, stats);
+                    continue;
+                }
+                foreach (IItemTweak tweak in tweaks)
+                    if (tweak.AppliesTo(item))
+                        tweak.ApplyTweak(item);
+
+                WeaponStats calStats = new()
+                {
+                    Damage = item.damage,
+                    Knockback = item.knockBack,
+                    Mana = item.mana,
+                    UseTime = item.useTime,
+                    UseAnimation = item.useAnimation,
+                    Velocity = item.shootSpeed
+                };
                 CalamityStats.Add(i, calStats);
             }
             
@@ -80,10 +83,5 @@ namespace Whipcackling.Content.Rebalances
         public int UseTime;
         public int UseAnimation;
         public float Velocity;
-
-        public override string ToString()
-        {
-            return $"Damage: {Damage}";
-        }
     }
 }

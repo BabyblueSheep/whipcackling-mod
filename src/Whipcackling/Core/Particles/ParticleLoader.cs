@@ -34,7 +34,7 @@ namespace Whipcackling.Core.Particles
         /// </summary>
         /// <param name="type">The particle type.</param>
         /// <returns>The particle type instance.</returns>
-        public static ModParticle GetParticle(int type) => type < Count ? particles[type] : null;
+        public static ModParticle GetParticle(int type) => particles[type];
 
         /// <summary>
         /// Get the type of a ModParticle by class. Assumes one instance per class.

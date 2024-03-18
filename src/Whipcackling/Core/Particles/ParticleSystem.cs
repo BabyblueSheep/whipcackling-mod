@@ -25,17 +25,21 @@ namespace Whipcackling.Core.Particles
         private static DynamicVertexBuffer _vertexBuffer;
         private static DynamicIndexBuffer _indexBuffer;
 
-        private static Dictionary<int, List<Particle>>[] _particles;
+        private static Dictionary<int, List<Particle>>[] _particles = new Dictionary<int, List<Particle>>[Enum.GetValues(typeof(ParticleDrawLayer)).Cast<ParticleDrawLayer>().Distinct().Count()];
 
         public override void Load()
         {
             if (Main.netMode == NetmodeID.Server)
                 return;
-            _particles = new Dictionary<int, List<Particle>>[Enum.GetValues(typeof(ParticleDrawLayer)).Cast<ParticleDrawLayer>().Distinct().Count()];
-            for (int i = 0; i < _particles.Length; i++)
-                _particles[i] = new Dictionary<int, List<Particle>>();
+            Main.QueueMainThreadAction(() =>
+            {
+                UIViewMatrix = new(Main.graphics.GraphicsDevice);
+                _vertexBuffer = new(Main.graphics.GraphicsDevice, typeof(ParticleVertex), 4 * PARTICLE_LIMIT, BufferUsage.WriteOnly);
+                _indexBuffer = new(Main.graphics.GraphicsDevice, typeof(short), 6 * PARTICLE_LIMIT, BufferUsage.WriteOnly);
+            });
 
-            Main.QueueMainThreadAction(() => UIViewMatrix = new SpriteViewMatrix(Main.graphics.GraphicsDevice));
+            for (int i = 0; i < _particles.Length; i++)
+                _particles[i] = new();
 
             On_Dust.UpdateDust += UpdatePaticles;
 
@@ -53,20 +57,18 @@ namespace Whipcackling.Core.Particles
             On_Main.DrawSurfaceBG -= DrawParticlesAfterBG;
             On_Main.DrawBackgroundBlackFill -= DrawParticlesAfterWalls;
             On_Main.DrawDust -= DrawParticlesAfterNPCsProjectiles;
+
+            ParticleLoader.Unload();
         }
 
         public override void PostSetupContent()
         {
             if (Main.netMode == NetmodeID.Server)
                 return;
-            Main.QueueMainThreadAction(() => _vertexBuffer = new DynamicVertexBuffer(Main.graphics.GraphicsDevice, typeof(ParticleVertex), 4 * PARTICLE_LIMIT, BufferUsage.WriteOnly));
-            Main.QueueMainThreadAction(() => _indexBuffer = new DynamicIndexBuffer(Main.graphics.GraphicsDevice, typeof(short), 6 * PARTICLE_LIMIT, BufferUsage.WriteOnly));
-
             List<ModParticle> particleTypes = ParticleLoader.particles;
             for (int i = 0; i < ParticleLoader.Count; i++)
             {
-                Mod.Logger.Info(_particles[(int)particleTypes[i].DrawLayer]);
-                _particles[(int)particleTypes[i].DrawLayer].Add(i, new List<Particle>());
+                _particles[(int)particleTypes[i].DrawLayer].Add(i, new());
             }
         }
 
