@@ -1,24 +1,9 @@
 Cooldowns.MeldWhipCooldown: Black Hole Tag Cooldown
 
-Buffs: {
-	MeldWhipNPCDebuff: {
-		DisplayName: Meld Whip N P C Debuff
-		Description: Mods.Whipcackling.Buffs.MeldWhipNPCDebuff.Description
+Enchantments: {
+	Conquering: {
+		Name: Conquering
+		Description: Minions take up a third of their original slot, deal a fourth of their original damage and reduce maximum health and mana by 5. Flat damage bonuses are also 50% less effective.
+		DeathReason: "{0}'s remaining lifeforce was taken by their followers."
 	}
-
-	MeldWhipNPCDebuffSuper: {
-		DisplayName: Meld Whip N P C Debuff Super
-		Description: Mods.Whipcackling.Buffs.MeldWhipNPCDebuffSuper.Description
-	}
-
-	NuclearWhipNPCDebuff: {
-		DisplayName: Nuclear Whip N P C Debuff
-		Description: Mods.Whipcackling.Buffs.NuclearWhipNPCDebuff.Description
-	}
-}
-
-Projectiles: {
-	MeldExplosion.DisplayName: Meld Explosion
-	MeldWhipProjectile.DisplayName: Meld Whip Projectile
-	NuclearWhipProjectile.DisplayName: Nuclear Whip Projectile
 }

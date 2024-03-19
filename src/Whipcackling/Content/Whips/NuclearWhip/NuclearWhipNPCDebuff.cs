@@ -41,7 +41,8 @@ namespace Whipcackling.Content.Whips.NuclearWhip
                 return;
             if (!npc.HasBuff<NuclearWhipNPCDebuff>())
                 return;
-            modifiers.FlatBonusDamage += ConstantsNuclear.TagDamage(TaggedAmount);
+            float projTagMultiplier = ProjectileID.Sets.SummonTagDamageMultiplier[projectile.type];
+            modifiers.FlatBonusDamage += ConstantsNuclear.TagDamage(TaggedAmount) * projTagMultiplier;
         }
     }
 

@@ -19,7 +19,7 @@ namespace Whipcackling.Content.Rebalances.Minions
             if (WhipcacklingConfig.Instance.BalanceMode == BalanceMode.Whipcackling)
             {
                 entity.usesIDStaticNPCImmunity = false;
-                entity.idStaticNPCHitCooldown = -1;
+                entity.idStaticNPCHitCooldown = -2;
                 entity.usesLocalNPCImmunity = true;
                 entity.localNPCHitCooldown = 15;
             }

@@ -35,7 +35,7 @@ namespace Whipcackling.Content.Rebalances.Minions
 
         public override void PostAI(Projectile projectile)
         {
-            if (WhipcacklingConfig.Instance.BalanceMode != BalanceMode.Default)
+            if (WhipcacklingConfig.Instance.BalanceMode != BalanceMode.Whipcackling)
                 return;
 
             if (!((HermitCrabMinion)(projectile.ModProjectile)).fly)
@@ -80,15 +80,13 @@ namespace Whipcackling.Content.Rebalances.Minions
                 }
                 if (chaseNPC && !((HermitCrabMinion)(projectile.ModProjectile)).fly && projectile.position.Y == projectile.oldPosition.Y && !((HermitCrabMinion)(projectile.ModProjectile)).HoleBelow())
                 {
-                    projectile.velocity.X *= 0.8f;
-                    if (Math.Abs(npcPositionX - projectile.position.X) < 100 && projectile.position.Y != projectile.oldPosition.Y)
-                        projectile.velocity.X *= 0.85f;
-                    if (Math.Abs(npcPositionX - projectile.position.X) < 300 && projectile.position.Y != projectile.oldPosition.Y)
-                        projectile.velocity.X *= 0.8f;
-                    float dist = npcPositionY - projectile.position.Y;
-                    if (dist < -100)
+                    float distX = Math.Abs(npcPositionX - projectile.position.X);
+                    projectile.velocity.X *= Utils.GetLerpValue(-1800, 100, distX, true);
+                    projectile.velocity.X *= Utils.GetLerpValue(-10, 30, distX, true);
+                    float distY = npcPositionY - projectile.position.Y;
+                    if (distY < -100 && distX < 20)
                     {
-                        projectile.velocity.Y -= 20 * Utils.GetLerpValue(0, -200, dist, true);
+                        projectile.velocity.Y -= 20 * Utils.GetLerpValue(0, -200, distY, true);
                     }
                 }
             }

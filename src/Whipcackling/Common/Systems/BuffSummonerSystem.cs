@@ -21,8 +21,14 @@ namespace Whipcackling.Common.Systems
 {
     public class BuffSummonerSystem : ModSystem
     {
-        private readonly static ILHook? _modifyHitNPCWithProj = new(typeof(CalamityPlayer).GetMethod("ModifyHitNPCWithProj")!, RemoveSummonerPenalty);
-        private readonly static Hook? _editWhipTagDamage = new(typeof(CalamityGlobalNPC).GetMethod("EditWhipTagDamage", BindingFlags.NonPublic | BindingFlags.Instance)!, RemoveMultiplicativeTagDamage);
+        private static ILHook?_modifyHitNPCWithProj;
+        private static Hook? _editWhipTagDamage;
+
+        public override void Load()
+        {
+            _modifyHitNPCWithProj = new(typeof(CalamityPlayer).GetMethod("ModifyHitNPCWithProj")!, RemoveSummonerPenalty);
+            _editWhipTagDamage = new(typeof(CalamityGlobalNPC).GetMethod("EditWhipTagDamage", BindingFlags.NonPublic | BindingFlags.Instance)!, RemoveMultiplicativeTagDamage);
+        }
 
         public override void Unload()
         {

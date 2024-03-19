@@ -48,17 +48,18 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 return;
             if (!(projectile.minion || ProjectileID.Sets.MinionShot[projectile.type] || projectile.sentry || ProjectileID.Sets.SentryShot[projectile.type]))
                 return;
+            float projTagMultiplier = ProjectileID.Sets.SummonTagDamageMultiplier[projectile.type];
             if (npc.HasBuff<MeldWhipNPCDebuff>())
             {
                 npc.RequestBuffRemoval(ModContent.BuffType<MeldWhipNPCDebuff>());
 
-                int proj = Projectile.NewProjectile(projectile.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<MeldExplosion>(), (int)(projectile.damage * ConstantsMeld.TagDamage), 0f, ai0: 1);
+                int proj = Projectile.NewProjectile(projectile.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<MeldExplosion>(), (int)(projectile.damage * ConstantsMeld.TagDamage * projTagMultiplier), 0f, ai0: 1);
             }
             else if (npc.HasBuff<MeldWhipNPCDebuffSuper>())
             {
                 npc.RequestBuffRemoval(ModContent.BuffType<MeldWhipNPCDebuffSuper>());
 
-                int proj = Projectile.NewProjectile(projectile.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<MeldExplosion>(), (int)(projectile.damage * ConstantsMeld.TagDamage), 0f, ai0: 3, ai1: 1);
+                int proj = Projectile.NewProjectile(projectile.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<MeldExplosion>(), (int)(projectile.damage * ConstantsMeld.TagDamage * projTagMultiplier), 0f, ai0: 3, ai1: 1);
             }
         }
 

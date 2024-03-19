@@ -1,0 +1,14 @@
+MeldWhipNPCDebuff: {
+	DisplayName: Meldic Tag
+	Description: uhg oh
+}
+
+MeldWhipNPCDebuffSuper: {
+	DisplayName: Shining Meldic Tag
+	Description: REALLY ugh oh
+}
+
+NuclearWhipNPCDebuff: {
+	DisplayName: Nuclear Tag
+	Description: help im melting nuclear throne
+}

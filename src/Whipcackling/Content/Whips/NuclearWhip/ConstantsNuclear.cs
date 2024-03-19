@@ -29,6 +29,6 @@ namespace Whipcackling.Content.Whips.NuclearWhip
         public static int WhipSegments => 20;
 
         //The additive tag damage of the whip.
-        public static int TagDamage(int enemiesTagged) => 50 + 5 * (int)Math.Ceiling(Math.Sqrt(enemiesTagged));
+        public static int TagDamage(int enemiesTagged) => 20 + 5 * (int)Math.Ceiling(Math.Pow(enemiesTagged, 0.3));
     }
 }
