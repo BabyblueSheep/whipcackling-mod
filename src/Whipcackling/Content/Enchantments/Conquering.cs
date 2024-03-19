@@ -122,7 +122,6 @@ namespace Whipcackling.Content.Enchantments
             if (!cursor.TryGotoNext(MoveType.After, i => i.MatchLdsfld(typeof(ItemID.Sets), "StaffMinionSlotsRequired")))
                 return;
             cursor.Index += 3;
-            Mod.Logger.Info(cursor.Next);
             cursor.EmitLdarg1();
             cursor.EmitDelegate((float slots, Item item) => {
                 if (item.Calamity().AppliedEnchantment is null)

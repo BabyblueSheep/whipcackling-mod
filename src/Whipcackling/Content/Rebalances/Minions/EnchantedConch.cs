@@ -45,6 +45,7 @@ namespace Whipcackling.Content.Rebalances.Minions
                 bool chaseNPC = false;
                 float npcPositionX = 0f;
                 float npcPositionY = 0f;
+
                 if (player.HasMinionAttackTargetNPC)
                 {
                     NPC npc = Main.npc[player.MinionAttackTargetNPC];
@@ -78,18 +79,46 @@ namespace Whipcackling.Content.Rebalances.Minions
                         }
                     }
                 }
-                if (chaseNPC && !((HermitCrabMinion)(projectile.ModProjectile)).fly && projectile.position.Y == projectile.oldPosition.Y && !((HermitCrabMinion)(projectile.ModProjectile)).HoleBelow())
+
+                float distX = Math.Abs(npcPositionX - projectile.position.X);
+                projectile.velocity.X *= Utils.GetLerpValue(-1200, 100, distX, true);
+
+                if (chaseNPC && !((HermitCrabMinion)(projectile.ModProjectile)).fly && projectile.position.Y == projectile.oldPosition.Y && !SmallHoleBelow(projectile))
                 {
-                    float distX = Math.Abs(npcPositionX - projectile.position.X);
-                    projectile.velocity.X *= Utils.GetLerpValue(-1800, 100, distX, true);
-                    projectile.velocity.X *= Utils.GetLerpValue(-10, 30, distX, true);
                     float distY = npcPositionY - projectile.position.Y;
-                    if (distY < -100 && distX < 20)
+                    if (Math.Abs(distY) < 30)
+                    {
+                        projectile.velocity.X *= Utils.GetLerpValue(-10, 30, distX, true);
+                    }
+                    if (distY < -100 && distX < 50)
                     {
                         projectile.velocity.Y -= 20 * Utils.GetLerpValue(0, -200, distY, true);
                     }
                 }
             }
+        }
+
+        private bool SmallHoleBelow(Projectile projectile)
+        {
+            int tileWidth = 4;
+            int tileX = (int)(projectile.Center.X / 16f) - tileWidth;
+            if (projectile.velocity.X > 0)
+            {
+                tileX += tileWidth;
+            }
+            int tileY = (int)((projectile.position.Y + projectile.height) / 16f);
+            for (int y = tileY; y < tileY + 1; y++)
+            {
+                for (int x = tileX; x < tileX + tileWidth; x++)
+                {
+                    if (Main.tile[x, y].HasTile)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+            return true;
         }
     }
 }
