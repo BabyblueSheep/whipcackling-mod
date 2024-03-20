@@ -18,6 +18,8 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 {
     public class NuclearWhipNPCDebuff : ModBuff
     {
+        public override string LocalizationCategory => "Whips.NuclearWhip";
+
         public override void SetStaticDefaults()
         {
             BuffID.Sets.IsATagBuff[Type] = true;

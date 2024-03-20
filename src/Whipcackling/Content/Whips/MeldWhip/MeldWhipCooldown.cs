@@ -18,7 +18,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
 
         public override bool ShouldDisplay => true;
 
-        public override LocalizedText DisplayName => Language.GetOrRegister($"Mods.Whipcackling.Cooldowns.{ID}");
+        public override LocalizedText DisplayName => Language.GetOrRegister($"Mods.Whipcackling.Whips.MeldWhip.{ID}");
 
         public override string Texture => $"{AssetDirectory.AssetPath}Textures/Whips/MeldWhip/MeldWhipCooldown";
 

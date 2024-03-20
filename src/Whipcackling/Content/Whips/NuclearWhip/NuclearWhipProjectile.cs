@@ -19,6 +19,8 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 {
     public class NuclearWhipProjectile : ModWhip, IDrawPixelated
     {
+        public override string LocalizationCategory => "Whips.NuclearWhip";
+
         public override SoundStyle SwingSound => SoundID.Item153;
         public override Color StringColor => new(140, 234, 87);
         public override int HandleOffset => 4;

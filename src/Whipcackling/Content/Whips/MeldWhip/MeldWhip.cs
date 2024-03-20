@@ -18,6 +18,8 @@ namespace Whipcackling.Content.Whips.MeldWhip
 {
     public class MeldWhip : ModItem
     {
+        public override string LocalizationCategory => "Whips.MeldWhip";
+
         public override void SetDefaults()
         {
             Item.DefaultToWhip(projectileId: ModContent.ProjectileType<MeldWhipProjectile>(), dmg: ConstantsMeld.ItemDamage, kb: ConstantsMeld.ItemKnockback, shootspeed: ConstantsMeld.ItemRange, animationTotalTime: ConstantsMeld.ItemUseTime);

@@ -1,0 +1,9 @@
+IdolOfVitriol: {
+	DisplayName: Idol Of Vitriol
+	Tooltip:
+		'''
+		Melee minion attacks have decreased immunity frames
+		Minions have a chance to burn enemies
+		Provides 3 seconds of immunity to lava
+		'''
+}

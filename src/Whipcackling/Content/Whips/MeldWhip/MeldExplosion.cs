@@ -18,6 +18,8 @@ namespace Whipcackling.Content.Whips.MeldWhip
 {
     public class MeldExplosion : ModProjectile, IDrawPixelated
     {
+        public override string LocalizationCategory => "Whips.MeldWhip";
+
         public ref float Strength => ref Projectile.ai[0];
         public bool BlackHole
         {

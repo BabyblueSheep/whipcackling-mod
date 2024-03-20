@@ -22,6 +22,8 @@ namespace Whipcackling.Content.Whips.MeldWhip
 {
     public class MeldWhipNPCDebuff : ModBuff
     {
+        public override string LocalizationCategory => "Whips.MeldWhip";
+
         public override void SetStaticDefaults()
         {
             BuffID.Sets.IsATagBuff[Type] = true;
@@ -31,6 +33,8 @@ namespace Whipcackling.Content.Whips.MeldWhip
 
     public class MeldWhipNPCDebuffSuper : ModBuff
     {
+        public override string LocalizationCategory => "Whips.MeldWhip";
+
         public override void SetStaticDefaults()
         {
             BuffID.Sets.IsATagBuff[Type] = true;

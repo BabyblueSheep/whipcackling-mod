@@ -1,0 +1,46 @@
+MeldWhip: {
+	MeldWhipNPCDebuff: {
+		DisplayName: Meldic Tag
+		Description: uh oh
+	}
+
+	MeldWhipNPCDebuffSuper: {
+		DisplayName: Imploding Meldic Tag
+		Description: UH OH
+	}
+
+	MeldWhip: {
+		DisplayName: Trail of Cessation
+		Tooltip:
+			'''
+			{$CommonItemTooltip.Whips}
+			Strike enemies with decaying energy
+			Decaying energy collapses into a nova from enemies hit by summons
+			The sixth struck enemy will be imbued with shining star energy
+			Shining star energy collapses into a powerful black hole from enemies hit by summons
+			'''
+	}
+
+	MeldExplosion.DisplayName: Meldic Explosion
+	MeldWhipProjectile.DisplayName: Trail of Cessation
+	MeldWhipCooldown: Black Hole Tag Cooldown
+}
+
+NuclearWhip: {
+	NuclearWhipNPCDebuff: {
+		DisplayName: Nuclear Tag
+		Description: help im melting nuclear throne
+	}
+
+	NuclearWhip: {
+		DisplayName: Plutonium Hunger
+		Tooltip:
+			'''
+			{$CommonItemTooltip.Whips}
+			Tagged enemies recieve more damage the more enemies are tagged
+			'Fläsyn!'
+			'''
+	}
+
+	NuclearWhipProjectile.DisplayName: Plutonium Hunger
+}

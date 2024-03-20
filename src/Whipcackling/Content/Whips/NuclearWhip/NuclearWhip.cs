@@ -23,6 +23,8 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 {
     public class NuclearWhip : ModItem
     {
+        public override string LocalizationCategory => "Whips.NuclearWhip";
+
         public override void SetDefaults()
         {
             Item.DefaultToWhip(projectileId: ModContent.ProjectileType<NuclearWhipProjectile>(), dmg: ConstantsNuclear.ItemDamage, kb: ConstantsNuclear.ItemKnockback, shootspeed: ConstantsNuclear.ItemRange, animationTotalTime: ConstantsNuclear.ItemUseTime);

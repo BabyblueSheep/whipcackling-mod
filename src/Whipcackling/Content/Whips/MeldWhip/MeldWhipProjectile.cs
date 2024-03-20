@@ -18,6 +18,8 @@ namespace Whipcackling.Content.Whips.MeldWhip
 {
     public class MeldWhipProjectile : ModWhip, IDrawPixelated
     {
+        public override string LocalizationCategory => "Whips.MeldWhip";
+
         public override SoundStyle SwingSound => SoundID.Item153;
         public override Color StringColor => new(30, 45, 72);
         public override int HandleOffset => 8;
