@@ -120,6 +120,18 @@ namespace Whipcackling.Content.Whips
             return false;
         }
 
+        public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
+        {
+            //if (Expired)
+                //modifiers._damageLimit = 0;
+        }
+
+        public override void ModifyHitPlayer(Player target, ref Player.HurtModifiers modifiers)
+        {
+           // if (Expired)
+                //modifiers._damageLimit = 0;
+        }
+
         /// <summary>
         /// Draws a line that follows a list of points, used for whip drawing.
         /// </summary>

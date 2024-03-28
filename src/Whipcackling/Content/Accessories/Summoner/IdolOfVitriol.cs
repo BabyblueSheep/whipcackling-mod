@@ -99,7 +99,7 @@ namespace Whipcackling.Content.Accessories.Summoner
             orig(chest, Type, firstItem);
             if (!firstItem)
             {
-                ChestItem item = new ChestItem(ModContent.ItemType<IdolOfVitriol>(), 1);
+                ChestItem item = new(ModContent.ItemType<IdolOfVitriol>(), 1);
 
                 chest.item[1].SetDefaults(item.Type);
                 chest.item[1].stack = item.Stack;

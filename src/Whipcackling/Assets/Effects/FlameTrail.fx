@@ -37,9 +37,9 @@ texture uTexturePalette0;
 sampler2D texturepal0 = sampler_state
 {
     texture = <uTexturePalette0>;
-    magfilter = LINEAR;
-    minfilter = LINEAR;
-    mipfilter = LINEAR;
+    magfilter = POINT;
+    minfilter = POINT;
+    mipfilter = POINT;
     AddressU = clamp;
     AddressV = clamp;
 };
@@ -47,9 +47,9 @@ texture uTexturePalette1;
 sampler2D texturepal1 = sampler_state
 {
     texture = <uTexturePalette1>;
-    magfilter = LINEAR;
-    minfilter = LINEAR;
-    mipfilter = LINEAR;
+    magfilter = POINT;
+    minfilter = POINT;
+    mipfilter = POINT;
     AddressU = clamp;
     AddressV = clamp;
 };

@@ -29,7 +29,7 @@ namespace Whipcackling
 
         private void LoadShaders()
         {
-            RegisterScreenFilter(AssetDirectory.Effects.Negazone);
+            RegisterScreenFilter(AssetDirectory.Effects.NegazoneEffect);
         }
 
         private void RegisterScreenFilter(Asset<Effect> shader, EffectPriority priority = EffectPriority.High)

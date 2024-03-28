@@ -7,3 +7,26 @@ IdolOfVitriol: {
 		Provides 3 seconds of immunity to lava
 		'''
 }
+
+MartianDataglove: {
+	DisplayName: Martian Dataglove
+	Tooltip:
+		'''
+		10% increased whip range and speed
+		All of your summon and sentry slots are converted into +5% summoning damage and +1% critical chance
+		Whip damage is additionally affected by 15% of melee damage
+		Tag effects are converted into debuffs. Press [KEY] to see a full list.
+		'''
+	TooltipVanillaTags:
+		'''
+		[c/eae6e2:Leather Whip: Confused]
+		[c/9fe430:Snapthorn: Poisoned]
+		[c/cccc9f:Spinal Tap: Armor Crunch]
+		[c/f1cb33:Firecracker: Hellfire]
+		[c/90c3e8:Cool Whip: Frostbite]
+		[c/fff9b5:Durendal: Midas]
+		[c/abb6b7:Dark Harvest: Shadowflame]
+		[c/f6f9fa:Morning Star: Crush Depth]
+		[c/cfc2ed:Kaleidoscope: Elemental Mix]
+		'''
+}

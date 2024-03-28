@@ -1,10 +1,12 @@
 ﻿using CalamityMod.Buffs.DamageOverTime;
+using CalamityMod.Items.Weapons.Melee;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
@@ -14,6 +16,8 @@ using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Common;
 using Whipcackling.Common.Systems.Drawing;
+using Whipcackling.Common.Utilities;
+using Whipcackling.Core;
 
 namespace Whipcackling.Content.Whips.NuclearWhip
 {
@@ -25,12 +29,13 @@ namespace Whipcackling.Content.Whips.NuclearWhip
         public override Color StringColor => new(140, 234, 87);
         public override int HandleOffset => 4;
 
+        private Vector2[] _prevPositionsSmoothed;
+        private float[] _prevRotationsSmoothed;
         private VertexStrip _strip;
 
-        public override void SafeSetStaticDefaults()
-        {
-            ProjectileID.Sets.TrailCacheLength[Projectile.type] = 10;
-        }
+        private Vector2[,] _prevPositionsPlane;
+        private Vector2[,] _prevPositionsPlaneSmoothed;
+        private VertexPlane _plane;
 
         public override void SafeSetDefaults()
         {
@@ -45,11 +50,11 @@ namespace Whipcackling.Content.Whips.NuclearWhip
             float ratio = Timer / timeToFlyOut;
             float progress = Utils.GetLerpValue(0.1f, 0.7f, ratio, true) * Utils.GetLerpValue(0.9f, 0.7f, ratio, true);
 
+            Projectile.WhipPointsForCollision.Clear();
+            Projectile.FillWhipControlPoints(Projectile, Projectile.WhipPointsForCollision);
+
             if (progress > 0.1f)
             {
-                Projectile.WhipPointsForCollision.Clear();
-                Projectile.FillWhipControlPoints(Projectile, Projectile.WhipPointsForCollision);
-
                 int id = DustID.CursedTorch;
                 Rectangle rectangle = Utils.CenteredRectangle(Projectile.WhipPointsForCollision[^1], new Vector2(30f));
                 Dust dust = Dust.NewDustDirect(rectangle.TopLeft(), rectangle.Width, rectangle.Height, id, 0f, 0f, 100, Color.White, progress);
@@ -58,17 +63,34 @@ namespace Whipcackling.Content.Whips.NuclearWhip
                 dust.scale *= 0.9f + Main.rand.NextFloat() * 0.9f;
             }
 
-            for (int i = Projectile.oldPos.Length - 1; i > 0; i--)
+            #region Previous positions
+            if (_prevPositionsPlane == null)
             {
-                Projectile.oldPos[i] = Projectile.oldPos[i - 1];
-            }
-            for (int i = Projectile.oldRot.Length - 1; i > 0; i--)
-            {
-                Projectile.oldRot[i] = Projectile.oldRot[i - 1];
+                _prevPositionsPlane ??= new Vector2[10, Projectile.WhipSettings.Segments];
+                for (int i = 0; i < 10; i++)
+                {
+                    for (int j = 0; j < Projectile.WhipSettings.Segments; j++)
+                    {
+                        _prevPositionsPlane[i, j] = Projectile.WhipPointsForCollision[j];
+                    }
+                }
             }
 
-            Projectile.oldPos[0] = Projectile.WhipPointsForCollision[^2];
-            Projectile.oldRot[0] = (Projectile.WhipPointsForCollision[^1] - Projectile.WhipPointsForCollision[^2]).ToRotation() - MathHelper.PiOver2;
+            int width = _prevPositionsPlane.GetLength(1);
+            int height = _prevPositionsPlane.GetLength(0);
+
+            for (int x = width - 1; x >= 0; x--)
+            {
+                for (int y = height - 1; y > 0; y--)
+                {
+                    _prevPositionsPlane[y, x] = _prevPositionsPlane[y - 1, x];
+                }
+            }
+            for (int x = 0; x < width; x++)
+            {
+                _prevPositionsPlane[0, x] = Projectile.WhipPointsForCollision[x];
+            }
+            #endregion
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -79,46 +101,79 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
         public void DrawPixelated()
         {
+            _plane ??= new VertexPlane();
             _strip ??= new VertexStrip();
 
             float timeToFlyOut = Main.player[Projectile.owner].itemAnimationMax * Projectile.MaxUpdates;
             float ratio = Timer / timeToFlyOut;
             float progress = Utils.GetLerpValue(0.2f, 0.5f, ratio, true) * Utils.GetLerpValue(0.9f, 0.7f, ratio, true);
 
-            Color StripColor(float p) => Color.White;
+            Color StripColorPlane(float progressX, float progressY) => new(1, 1, 1, (1 - Easings.InSine(progressY)) * Easings.OutQuint(progressX));
 
+            Color StripColor(float p) => Color.White;
             float StripWidth(float p) => 16 * progress;
 
-            int accuracy = 25; // Accuracy of the Bezier curve. The bigger, the more accurate
+            #region Plane positions
+            // Prepare Bezier curving
+            int accuracy = 10; // Accuracy of the Bezier curve. The bigger, the more accurate
+            _prevPositionsPlaneSmoothed ??= new Vector2[accuracy, Projectile.WhipSettings.Segments];
+            Vector2 startPoint, endPoint, middlePoint;
+            float middleIndex;
 
-            Vector2 startPoint = Projectile.oldPos[0];
-            Vector2 endPoint = Projectile.oldPos[^1];
-            int middleIndex = Projectile.oldPos.Length / 2;
-            Vector2 middlePoint = Projectile.oldPos[middleIndex];
+            int width = _prevPositionsPlane.GetLength(1);
+            int height = _prevPositionsPlane.GetLength(0);
+            int widthSmooth = _prevPositionsPlaneSmoothed.GetLength(1);
+            int heightSmooth = _prevPositionsPlaneSmoothed.GetLength(0);
 
-            // Make middle point further for a more pronounced curve https://stackoverflow.com/questions/47177493/python-point-on-a-line-closest-to-third-point
-            Vector2 line = endPoint - startPoint;
-            float lineLength = line.LengthSquared();
-            float coefficient = (line.Y * (middlePoint.Y - startPoint.Y) + line.X * (middlePoint.X - startPoint.X)) / lineLength;
-            Vector2 middlePointOnLine = startPoint + line * coefficient;
-            Vector2 controlPoint = Vector2.Lerp(middlePoint, middlePointOnLine, -(1 + 0f * progress));
-
-            Vector2[] curvePositions = new Vector2[accuracy];
-            curvePositions[0] = startPoint;
-            float[] curveRotations = new float[accuracy];
-
-            //Quadratic Bezier curve https://en.wikipedia.org/wiki/De_Casteljau%27s_algorithm
-            for (int i = 1; i < accuracy; i++)
+            middleIndex = (height - 1) / 2f;
+            for (int x = 0; x < width; x++)
             {
-                float p = i / (float)accuracy;
+                startPoint = _prevPositionsPlane[0, x];
+                endPoint = _prevPositionsPlane[height - 1, x];
+                middlePoint = _prevPositionsPlane[(int)middleIndex, x];
 
-                Vector2 lerpedStart = Vector2.Lerp(startPoint, controlPoint, p);
-                Vector2 lerpedEnd = Vector2.Lerp(controlPoint, endPoint, p);
+                // Make middle point further for a more pronounced curve https://stackoverflow.com/questions/47177493/python-point-on-a-line-closest-to-third-point
+                Vector2 line = endPoint - startPoint;
+                float lineLength = line.LengthSquared();
+                float coefficient = (line.Y * (middlePoint.Y - startPoint.Y) + line.X * (middlePoint.X - startPoint.X)) / lineLength;
+                Vector2 middlePointOnLine = startPoint + line * coefficient;
+                Vector2 controlPoint = Vector2.Lerp(middlePoint, middlePointOnLine, -(1 + 0f * progress));
 
-                curvePositions[i] = Vector2.Lerp(lerpedStart, lerpedEnd, p);
-                curveRotations[i] = (curvePositions[i] - curvePositions[i - 1]).ToRotation();
+                _prevPositionsPlaneSmoothed[0, x] = startPoint;
+                for (int i = 1; i < accuracy; i++)
+                {
+                    float p = i / (float)accuracy;
+
+                    Vector2 lerpedStart = Vector2.Lerp(startPoint, controlPoint, p);
+                    Vector2 lerpedEnd = Vector2.Lerp(controlPoint, endPoint, p);
+
+                    _prevPositionsPlaneSmoothed[i, x] = Vector2.Lerp(lerpedStart, lerpedEnd, p);
+                }
             }
-            curveRotations[0] = curveRotations[1];
+            #endregion
+            #region Strip positions
+            _prevPositionsSmoothed ??= new Vector2[accuracy];
+            _prevRotationsSmoothed ??= new float[accuracy];
+            for (int i = 0; i < accuracy - 1; i++)
+            {
+                _prevPositionsSmoothed[i] = _prevPositionsPlaneSmoothed[i, width - 1];
+                _prevRotationsSmoothed[i] = (_prevPositionsPlaneSmoothed[i + 1, width - 1] - _prevPositionsPlaneSmoothed[i, width - 1]).ToRotation();
+            }
+            _prevPositionsSmoothed[accuracy - 1] = _prevPositionsPlaneSmoothed[accuracy - 1, width - 1];
+            _prevRotationsSmoothed[accuracy - 1] = _prevRotationsSmoothed[accuracy - 2];
+            #endregion
+
+            _plane.PreparePlane(_prevPositionsPlaneSmoothed, StripColorPlane, -Main.screenPosition);
+
+            Effect planeEffect = AssetDirectory.Effects.WhipSwingTrail.Value;
+            planeEffect.Parameters["uTransformMatrix"].SetValue(Main.GameViewMatrix.NormalizedTransformationmatrix);
+            planeEffect.Parameters["uTime"].SetValue(Main.GlobalTimeWrappedHourly);
+            planeEffect.Parameters["uTexturePalette0"].SetValue(AssetDirectory.Textures.Extra.Palettes.AcidFlameTrailPaletteHue.Value);
+
+            planeEffect.CurrentTechnique.Passes[0].Apply();
+            _plane.DrawMesh();
+
+            _strip.PrepareStrip(_prevPositionsSmoothed, _prevRotationsSmoothed, StripColor, StripWidth, -Main.screenPosition);
 
             Effect effect = AssetDirectory.Effects.FlameTrail.Value;
             effect.Parameters["uTime"].SetValue(Main.GlobalTimeWrappedHourly);
@@ -130,10 +185,7 @@ namespace Whipcackling.Content.Whips.NuclearWhip
             effect.Parameters["uTexturePalette0"].SetValue(AssetDirectory.Textures.Extra.Palettes.MeldFlamePaletteValue.Value);
             effect.Parameters["uTexturePalette1"].SetValue(AssetDirectory.Textures.Extra.Palettes.AcidFlamePaletteHue.Value);
 
-
             effect.CurrentTechnique.Passes[0].Apply();
-
-            _strip.PrepareStripWithProceduralPadding(curvePositions, curveRotations, StripColor, StripWidth, -Main.screenPosition);
             _strip.DrawTrail();
 
             Main.pixelShader.CurrentTechnique.Passes[0].Apply();

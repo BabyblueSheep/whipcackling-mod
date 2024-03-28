@@ -5,3 +5,5 @@ Enchantments: {
 		DeathReason: "{0}'s remaining lifeforce was taken by their followers."
 	}
 }
+
+Keybinds.ExpandTooltip.DisplayName: Expand Tooltip
