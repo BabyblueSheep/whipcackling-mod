@@ -1,23 +1,10 @@
 ﻿using CalamityMod;
 using CalamityMod.Items;
-using CalamityMod.Items.Weapons.Summon;
 using CalamityMod.NPCs.AcidRain;
 using CalamityMod.Rarities;
-using CalamityMod.UI;
-using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Whipcackling.Common;
-using Whipcackling.Content.Rebalances;
-using Whipcackling.Content.Whips.MeldWhip;
-using static CalamityMod.Items.CalamityGlobalItem;
 
 namespace Whipcackling.Content.Whips.NuclearWhip
 {

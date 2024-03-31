@@ -1,16 +1,14 @@
-﻿using CalamityMod.Items.Weapons.DraedonsArsenal;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
-using Terraria.GameContent.Drawing;
 using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
-using Whipcackling.Assets;
 using Whipcackling.Common.Utilities;
 using Whipcackling.Core.Particles.Enums;
 
@@ -25,7 +23,7 @@ namespace Whipcackling.Core.Particles
         private static DynamicVertexBuffer _vertexBuffer;
         private static DynamicIndexBuffer _indexBuffer;
 
-        private static Dictionary<int, List<Particle>>[] _particles = new Dictionary<int, List<Particle>>[Enum.GetValues(typeof(ParticleDrawLayer)).Cast<ParticleDrawLayer>().Distinct().Count()];
+        private static Dictionary<int, List<Particle>>[] _particles;
 
         public override void Load()
         {
@@ -38,13 +36,15 @@ namespace Whipcackling.Core.Particles
                 _indexBuffer = new(Main.graphics.GraphicsDevice, typeof(short), 6 * PARTICLE_LIMIT, BufferUsage.WriteOnly);
             });
 
+            _particles = new Dictionary<int, List<Particle>>[5];
             for (int i = 0; i < _particles.Length; i++)
                 _particles[i] = new();
 
-            On_Dust.UpdateDust += UpdatePaticles;
+            On_Dust.UpdateDust += UpdateParticles;
 
             On_Main.DrawSurfaceBG += DrawParticlesAfterBG;
             On_Main.DrawBackgroundBlackFill += DrawParticlesAfterWalls;
+            On_Main.DoDraw_Tiles_Solid += DrawParticlesAfterTiles;
             On_Main.DrawDust += DrawParticlesAfterNPCsProjectiles;
         }
 
@@ -52,10 +52,11 @@ namespace Whipcackling.Core.Particles
         {
             if (Main.netMode == NetmodeID.Server)
                 return;
-            On_Dust.UpdateDust -= UpdatePaticles;
+            On_Dust.UpdateDust -= UpdateParticles;
 
             On_Main.DrawSurfaceBG -= DrawParticlesAfterBG;
             On_Main.DrawBackgroundBlackFill -= DrawParticlesAfterWalls;
+            On_Main.DoDraw_Tiles_Solid -= DrawParticlesAfterTiles;
             On_Main.DrawDust -= DrawParticlesAfterNPCsProjectiles;
 
             ParticleLoader.Unload();
@@ -101,6 +102,7 @@ namespace Whipcackling.Core.Particles
                 return;
 
             ModParticle particleType = ParticleLoader.particles[type];
+            Asset<Texture2D> texture = ModContent.Request<Texture2D>(particleType.Texture, AssetRequestMode.ImmediateLoad);
 
             List<Particle> particles = _particles[(int)particleType.DrawLayer][type];
 
@@ -113,7 +115,7 @@ namespace Whipcackling.Core.Particles
                 Custom = new float[] { custom1, custom2, custom3 },
                 Scale = scale ?? Vector2.One,
                 Rotation = rotation,
-                Position = position,
+                Position = position - texture.Size() * 0.5f / particleType.Variants,
                 Color = color ?? Color.White,
                 Variant = variant,
             };
@@ -144,18 +146,18 @@ namespace Whipcackling.Core.Particles
         }
 
         // Go over every every particle instance to run its Update method, update its position with velocity, increase time and remove it if it expires. 
-        private void UpdatePaticles(On_Dust.orig_UpdateDust orig)
+        private void UpdateParticles(On_Dust.orig_UpdateDust orig)
         {
             orig();
 
             for (int layer = 0; layer < _particles.Length; layer++)
             {
-                for (int type = 0; type < _particles[layer].Count; type++)
+                foreach (KeyValuePair<int, List<Particle>> entry in _particles[layer])
                 {
-                    List<Particle> particles = _particles[layer][type];
-                    ModParticle particleType = ParticleLoader.GetParticle(type);
+                    List<Particle> particles = entry.Value;
+                    ModParticle particleType = ParticleLoader.GetParticle(entry.Key);
 
-                    for (int i = 0; i < _particles[layer][type].Count;  i++)
+                    for (int i = 0; i < particles.Count;  i++)
                     {
                         Particle particle = particles[i];
 
@@ -163,7 +165,7 @@ namespace Whipcackling.Core.Particles
                         particle.Time++;
                         if (particle.Progress >= 1)
                         {
-                            _particles[layer][type].Remove(particles[i]);
+                            particles.Remove(particles[i]);
                             i--;
                             continue;
                         }
@@ -171,7 +173,6 @@ namespace Whipcackling.Core.Particles
 
                         particles[i] = particle;
                     }
-                    _particles[layer][type] = particles;
                 }
             }
         }
@@ -195,8 +196,10 @@ namespace Whipcackling.Core.Particles
             DrawParticles(ParticleDrawLayer.AfterWalls);
         }
 
-        public override void PostDrawTiles()
+        private void DrawParticlesAfterTiles(On_Main.orig_DoDraw_Tiles_Solid orig, Main self)
         {
+            orig(self);
+
             DrawParticles(ParticleDrawLayer.AfterTiles);
         }
 
@@ -243,11 +246,11 @@ namespace Whipcackling.Core.Particles
             Main.graphics.GraphicsDevice.RasterizerState = rasterizerState;
 
             var particles = _particles[(int)layer];
-            for (int type = 0; type < particles.Count; type++)
+            foreach (KeyValuePair<int, List<Particle>> entry in particles)
             {
-                int amount = particles[type].Count;
-
-                ModParticle particleType = ParticleLoader.GetParticle(type);
+                int amount = entry.Value.Count;
+                
+                ModParticle particleType = ParticleLoader.GetParticle(entry.Key);
                 Texture2D texture = ModContent.Request<Texture2D>(particleType.Texture).Value;
                 Effect particle = particleType.Effect;
                 particle.Parameters["uTransformMatrix"].SetValue(matrix);
@@ -259,7 +262,7 @@ namespace Whipcackling.Core.Particles
 
                 for (int i = 0; i < amount; i++)
                 {
-                    Particle instance = particles[type][i];
+                    Particle instance = entry.Value[i];
                     Vector2 actualPos = ui ? instance.Position : instance.Position - Main.screenPosition;
 
                     Rectangle frame = particleType.GetFrame(instance);

@@ -1,18 +1,12 @@
-﻿using CalamityMod.Items.Potions.Alcohol;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Newtonsoft.Json.Linq;
 using ReLogic.Content;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
 using Terraria.GameContent;
-using Terraria.GameContent.Animations;
 using Terraria.ID;
 using Terraria.ModLoader;
 

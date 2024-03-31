@@ -1,15 +1,7 @@
 ﻿using CalamityMod;
-using CalamityMod.CalPlayer;
-using CalamityMod.Projectiles;
-using CalamityMod.Projectiles.Melee;
-using Microsoft.Xna.Framework;
 using MonoMod.Cil;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;
@@ -123,7 +115,8 @@ namespace Whipcackling.Content.Enchantments
                 return;
             cursor.Index += 3;
             cursor.EmitLdarg1();
-            cursor.EmitDelegate((float slots, Item item) => {
+            cursor.EmitDelegate((float slots, Item item) =>
+            {
                 if (item.Calamity().AppliedEnchantment is null)
                     return slots;
                 float modifier = item.Calamity().AppliedEnchantment.Value.ID == 190 ? 3f : 1;
@@ -138,7 +131,7 @@ namespace Whipcackling.Content.Enchantments
                 return;
             cursor.Index -= 4;
             cursor.EmitLdarg0();
-            cursor.EmitDelegate((float flatBonus, Projectile projectile) => 
+            cursor.EmitDelegate((float flatBonus, Projectile projectile) =>
             {
                 if (projectile.GetGlobalProjectile<ConqueringMinion>().IsDivided)
                     return flatBonus * 0.5f;

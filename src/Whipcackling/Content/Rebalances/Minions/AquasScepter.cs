@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ID;
+﻿using Terraria.ID;
 using Terraria;
-using Terraria.ModLoader.Config;
 using Terraria.ModLoader;
-using CalamityMod.Items.Weapons.Summon;
 using Whipcackling.Common.Configs;
 using CalamityMod.Projectiles.Summon;
 using Terraria.DataStructures;

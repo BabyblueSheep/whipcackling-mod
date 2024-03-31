@@ -6,7 +6,6 @@ using Terraria.ID;
 using Terraria;
 using Terraria.ModLoader;
 using CalamityMod.Cooldowns;
-using Whipcackling.Core.Particles;
 using Whipcackling.Assets;
 using Whipcackling.Common.Utilities;
 

@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Graphics;
-using Terraria.ID;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
@@ -71,6 +70,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
             Projectile.DamageType = DamageClass.Summon;
             Projectile.friendly = true;
             Projectile.tileCollide = false;
+            Projectile.ignoreWater = true;
             Projectile.penetrate = -1;
             Projectile.timeLeft = 20;
             Projectile.hide = true;
@@ -81,7 +81,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
             _noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
         }
 
-        public override bool PreAI()
+        public override void AI()
         {
             if (!Initialized)
             {
@@ -252,8 +252,6 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 }
                 Projectile.damage = 0;
             }
-
-            return false;
         }
 
         public override bool? Colliding(Rectangle projHitbox, Rectangle targetHitbox)

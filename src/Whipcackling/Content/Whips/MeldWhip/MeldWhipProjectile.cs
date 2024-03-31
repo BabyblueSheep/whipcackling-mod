@@ -1,17 +1,13 @@
 ﻿using CalamityMod;
-using CalamityMod.Cooldowns;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Threading;
 using Terraria;
 using Terraria.Audio;
-using Terraria.GameContent;
 using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
-using Whipcackling.Common;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
 using Whipcackling.Core;

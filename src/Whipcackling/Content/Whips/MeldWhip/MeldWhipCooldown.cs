@@ -1,13 +1,6 @@
-﻿using CalamityMod;
-using CalamityMod.Cooldowns;
+﻿using CalamityMod.Cooldowns;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria.Localization;
-using Terraria.ModLoader;
 using Whipcackling.Assets;
 
 namespace Whipcackling.Content.Whips.MeldWhip

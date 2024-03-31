@@ -1,15 +1,8 @@
-﻿using CalamityMod.CalPlayer;
-using CalamityMod.Items.Weapons.Summon;
+﻿using CalamityMod.Items.Weapons.Summon;
 using CalamityMod.Projectiles.Summon;
 using MonoMod.Cil;
 using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 using Whipcackling.Common.Configs;
 

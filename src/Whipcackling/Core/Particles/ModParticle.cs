@@ -1,13 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Composition.Hosting.Core;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.GameContent.RGB;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Core.Particles.Enums;

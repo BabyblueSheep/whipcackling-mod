@@ -1,22 +1,12 @@
 ﻿using CalamityMod.Graphics;
-using CalamityMod.NPCs.TownNPCs;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Steamworks;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using Whipcackling.Assets;
-using Whipcackling.Common;
 
 namespace Whipcackling.Content.Whips.MeldWhip
 {

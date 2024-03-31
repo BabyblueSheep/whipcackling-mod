@@ -1,15 +1,7 @@
-﻿using CalamityMod.CalPlayer;
-using CalamityMod.Graphics;
+﻿using CalamityMod.Graphics;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using MonoMod.RuntimeDetour;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
-using Terraria.Achievements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Whipcackling.Assets;

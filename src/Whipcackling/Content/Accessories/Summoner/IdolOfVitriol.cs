@@ -1,14 +1,9 @@
 ﻿using CalamityMod.Items;
-using CalamityMod.NPCs;
 using CalamityMod.Schematics;
 using CalamityMod.World;
 using MonoMod.RuntimeDetour;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.ID;

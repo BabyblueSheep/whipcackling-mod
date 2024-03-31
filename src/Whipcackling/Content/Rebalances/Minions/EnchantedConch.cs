@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ID;
 using Terraria;
 using Terraria.ModLoader;
 using CalamityMod.Items.Weapons.Summon;
 using CalamityMod.Projectiles.Summon;
 using Whipcackling.Common.Configs;
 using Microsoft.Xna.Framework;
-using CalamityMod;
 
 namespace Whipcackling.Content.Rebalances.Minions
 {

@@ -1,12 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.Graphics;
-using Whipcackling.Core.Particles.Enums;
 
 namespace Whipcackling.Core.Particles
 {

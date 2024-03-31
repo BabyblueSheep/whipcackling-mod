@@ -1,11 +1,8 @@
 ﻿using ReLogic.Content.Sources;
 using ReLogic.Content;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Whipcackling.Common.Utilities
 {
