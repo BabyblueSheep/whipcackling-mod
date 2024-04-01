@@ -10,6 +10,7 @@ IdolOfVitriol: {
 
 MartianDataglove: {
 	LessCoolFlake.DisplayName: Less Cool Flake
+	HolyAttack.DisplayName: Holy Attack
 	DisplayName: Martian Dataglove
 	Tooltip:
 		'''
@@ -18,17 +19,13 @@ MartianDataglove: {
 		Whip damage is additionally affected by 15% of melee damage
 		Tag effects are converted into on-hit effects. Press [KEY] to see a full list.
 		'''
-	TooltipVanillaTags:
-		'''
-		[i:BlandWhip][c/eae6e2:Leather Whip: Inflicts Confused]
-		[i:ThornWhip][c/9fe430:Snapthorn: Inflicts Poisoned]
-		[i:BoneWhip][c/cccc9f:Spinal Tap: Spews several bones from the target]
-		[i:FireWhip][c/f1cb33:Firecracker: Creates a blazing explosion at the target]
-		[i:CoolWhip][c/90c3e8:Cool Whip: Summons additional snowflakes on hit]
-		[i:SwordWhip][c/fff9b5:Durendal: Damages nearby enemies on hit]
-		[i:ScytheWhip][c/abb6b7:Dark Harvest: Spreads dark energy when killing an enemy]
-		[i:MaceWhip][c/f6f9fa:Morning Star: Inflicts Crush Depth]
-		[i:RainbowWhip][c/cfc2ed:Kaleidoscope: Creates 4 prismatic projectiles around the target]
-		'''
-	HolyAttack.DisplayName: Holy Attack
+	LeatherWhipTooltip: "[i:BlandWhip][c/eae6e2:Leather Whip: Inflicts Confused]"
+	SnapthornTooltip: "[i:ThornWhip][c/9fe430:Snapthorn: Inflicts Poisoned]"
+	SpinalTapTooltip: "[i:BoneWhip][c/cccc9f:Spinal Tap: Spews several bones from the target]"
+	FirecrackerTooltip: "[i:FireWhip][c/f1cb33:Firecracker: Creates a blazing explosion at the target]"
+	CoolWhipTooltip: "[i:CoolWhip][c/90c3e8:Cool Whip: Summons additional snowflakes on hit]"
+	DurendalTooltip: "[i:SwordWhip][c/fff9b5:Durendal: Damages nearby enemies on hit]"
+	DarkHarvestTooltip: "[i:ScytheWhip][c/abb6b7:Dark Harvest: Spreads dark energy when killing an enemy]"
+	MorningStarTooltip: "[i:MaceWhip][c/f6f9fa:Morning Star: Inflicts Crush Depth]"
+	KaleidoscopeTooltip: "[i:RainbowWhip][c/cfc2ed:Kaleidoscope: Creates 4 prismatic projectiles around the target]"
 }

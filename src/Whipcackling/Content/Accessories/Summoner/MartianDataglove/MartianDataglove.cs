@@ -2,15 +2,18 @@
 using CalamityMod.Buffs.DamageOverTime;
 using CalamityMod.Buffs.StatDebuffs;
 using CalamityMod.Items;
+using Microsoft.CodeAnalysis;
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Terraria;
 using Terraria.Audio;
+using Terraria.GameContent.Drawing;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
+using Whipcackling.Assets;
 using Whipcackling.Content.Particles;
 using Whipcackling.Core.Particles;
 
@@ -45,11 +48,15 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
             tooltips.IntegrateHotkey(MartianDataglovePlayer.ExpandTooltip);
             if (!MartianDataglovePlayer.ExpandTooltip.Current)
                 return;
-            tooltips.Add(new TooltipLine(
-                Mod,
-                "Whipcackling:VanillaTagDebuffs",
-                Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.TooltipVanillaTags").ToString()
+
+            foreach (KeyValuePair<int, MartianDatagloveEffect> entry in MartianDatagloveProjectile.TagConversions)
+            {
+                tooltips.Add(new TooltipLine(
+                    Mod,
+                    "Whipcackling:VanillaTagDebuffs",
+                    entry.Value.Tooltip.ToString()
                 ));
+            }
         }
     }
 
@@ -99,16 +106,22 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
 
     public class MartianDatagloveProjectile : GlobalProjectile
     {
-        public static Dictionary<int, Action<Player, Projectile, NPC, int>> TagConversions { get; set; }
+        public static SoundStyle HolyAttackSound = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/HolyAttack", 3)
+        {
+            PitchVariance = 0.5f,
+            Volume = 0.7f
+        };
+
+        public static Dictionary<int, MartianDatagloveEffect> TagConversions { get; set; }
 
         public override void Load()
         {
             TagConversions ??= new();
             TagConversions.Clear();
 
-            TagConversions.Add(BuffID.BlandWhipEnemyDebuff, (owner, whip, target, buffTime) => target.AddBuff(BuffID.Confused, buffTime));
-            TagConversions.Add(BuffID.ThornWhipNPCDebuff, (owner, whip, target, buffTime) => target.AddBuff(BuffID.Poisoned, buffTime));
-            TagConversions.Add(BuffID.BoneWhipNPCDebuff, (owner, whip, target, buffTime) =>
+            TagConversions.Add(BuffID.BlandWhipEnemyDebuff, new((owner, whip, target, buffTime) => target.AddBuff(BuffID.Confused, buffTime), Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.LeatherWhipTooltip")));
+            TagConversions.Add(BuffID.ThornWhipNPCDebuff, new((owner, whip, target, buffTime) => target.AddBuff(BuffID.Poisoned, buffTime), Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.SnapthornTooltip")));
+            TagConversions.Add(BuffID.BoneWhipNPCDebuff, new((owner, whip, target, buffTime) =>
             {
                 int counter = 0;
                 for (int i = 0; i < whip.localNPCImmunity.Length; i++)
@@ -118,19 +131,19 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                 }
                 if ((counter - 1) % 3 != 0)
                     return;
-                int amount = buffTime / 60;
+                int amount = (int)Math.Ceiling(buffTime / 60.0);
                 for (int i = 0; i < amount; i++)
                 {
                     Vector2 speed = new(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-0.9f, -1.1f));
                     Projectile proj = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), target.Center - new Vector2(0, target.height * 0.75f), speed * 5, ProjectileID.Bone, (int)Math.Ceiling((double)whip.damage / amount), 0, whip.owner);
                     proj.ranged = false;
                 }
-            });
-            TagConversions.Add(BuffID.FlameWhipEnemyDebuff, (owner, whip, target, buffTime) =>
+            }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.SpinalTapTooltip")));
+            TagConversions.Add(BuffID.FlameWhipEnemyDebuff, new((owner, whip, target, buffTime) =>
             {
-                Projectile.NewProjectile(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ProjectileID.FireWhipProj, (int)Math.Ceiling((double)whip.damage * 0.5f * (buffTime / 240)), 0, whip.owner);
-            });
-            TagConversions.Add(BuffID.CoolWhipNPCDebuff, (owner, whip, target, buffTime) =>
+                Projectile.NewProjectile(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ProjectileID.FireWhipProj, (int)Math.Ceiling((double)whip.damage * 0.5f * Math.Ceiling(buffTime / 240.0)), 0, whip.owner);
+            }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.FirecrackerTooltip")));
+            TagConversions.Add(BuffID.CoolWhipNPCDebuff, new((owner, whip, target, buffTime) =>
             {
                 int counter = 0;
                 for (int i = 0; i < whip.localNPCImmunity.Length; i++)
@@ -140,9 +153,9 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                     if (counter == 2)
                         return;
                 }
-                Projectile proj = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<LessCoolFlake>(), 5, 0, whip.owner, buffTime);
-            });
-            TagConversions.Add(BuffID.SwordWhipNPCDebuff, (owner, whip, target, buffTime) =>
+                Projectile proj = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<LessCoolFlake>(), 5, 0, whip.owner, ai2: (float)Math.Ceiling(buffTime / 4f));
+            }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.CoolWhipTooltip")));
+            TagConversions.Add(BuffID.SwordWhipNPCDebuff, new((owner, whip, target, buffTime) =>
             {
                 int counter = 0;
                 for (int i = 0; i < whip.localNPCImmunity.Length; i++)
@@ -153,7 +166,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                         return;
                 }
                 List<NPC> npcs = new();
-                int maxNPCs = (int)(buffTime / 60f);
+                int maxNPCs = (int)Math.Ceiling(buffTime / 60f);
                 for (int i = 0; i < Main.npc.Length; i++)
                 {
                     NPC npc = Main.npc[i];
@@ -167,6 +180,8 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                 npcs.Sort((NPC x, NPC y) => Vector2.Distance(x.Center, target.Center).CompareTo(Vector2.Distance(y.Center, target.Center)));
                 for (int npcCount = 0; npcCount < npcs.Count; npcCount++)
                 {
+                    if (npcCount == 0)
+                        SoundEngine.PlaySound(HolyAttackSound, target.Center);
                     if (npcCount == maxNPCs)
                         break;
                     NPC npc = npcs[npcCount];
@@ -202,7 +217,48 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                         );
                     }
                 }
-            });
+            }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.DurendalTooltip")));
+            TagConversions.Add(BuffID.ScytheWhipEnemyDebuff, new((owner, whip, target, buffTime) =>
+            {
+                if (target.life > 0)
+                    return;
+                ParticleOrchestrator.RequestParticleSpawn(clientOnly: false, ParticleOrchestraType.BlackLightningHit, new ParticleOrchestraSettings
+                {
+                    PositionInWorld = target.Center,
+                });
+
+                List<NPC> npcs = new();
+                int maxNPCs = (int)Math.Ceiling(buffTime / 30f);
+                for (int i = 0; i < Main.npc.Length; i++)
+                {
+                    NPC npc = Main.npc[i];
+                    if (!npc.active || npc.friendly || npc.dontTakeDamage || npc == target)
+                        continue;
+                    if (Vector2.Distance(npc.Center, target.Center) < 1200)
+                    {
+                        npcs.Add(npc);
+                    }
+                }
+                npcs.Sort((NPC x, NPC y) => Vector2.Distance(x.Center, target.Center).CompareTo(Vector2.Distance(y.Center, target.Center)));
+                for (int npcCount = 0; npcCount < npcs.Count; npcCount++)
+                {
+                    if (npcCount == maxNPCs)
+                        break;
+                    NPC npc = npcs[npcCount];
+                    Main.NewText(npc.whoAmI);
+                    Projectile k = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ProjectileID.ScytheWhipProj, 100, 0, whip.owner, ai0: npc.whoAmI + 1);
+                }
+            }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.DarkHarvestTooltip")));
+            TagConversions.Add(BuffID.MaceWhipNPCDebuff, new((owner, whip, target, buffTime) => target.AddBuff(ModContent.BuffType<CrushDepth>(), buffTime), Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.MorningStarTooltip")));
+            TagConversions.Add(BuffID.RainbowWhipNPCDebuff, new((owner, whip, target, buffTime) =>
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    Vector2 velocity = Main.rand.NextVector2Circular(1f, 1f) + Main.rand.NextVector2CircularEdge(5f, 5f);
+
+                    Projectile.NewProjectile(whip.GetSource_FromThis(), target.position, velocity, ProjectileID.FairyQueenMagicItemShot, 10, 2, whip.owner, -1, i / 32f + owner.miscCounterNormalized);
+                }
+            }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.KaleidoscopeTooltip")));
         }
 
         public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
@@ -211,11 +267,11 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                 return;
             if (!Main.player[projectile.owner].GetModPlayer<MartianDataglovePlayer>().MartianDataglove)
                 return;
-            foreach (KeyValuePair<int, Action<Player, Projectile, NPC, int>> entry in TagConversions)
+            foreach (KeyValuePair<int, MartianDatagloveEffect> entry in TagConversions)
             {
                 if (target.HasBuff(entry.Key))
                 {
-                    entry.Value(Main.player[projectile.owner], projectile, target, target.buffTime[target.FindBuffIndex(entry.Key)]);
+                    entry.Value.Effect(Main.player[projectile.owner], projectile, target, target.buffTime[target.FindBuffIndex(entry.Key)]);
                 }
             }
         }
@@ -229,6 +285,18 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
             {
                 npcLoot.Add(ModContent.ItemType<MartianDataglove>(), 800);
             }
+        }
+    }
+
+    public struct MartianDatagloveEffect
+    {
+        public Action<Player, Projectile, NPC, int> Effect;
+        public LocalizedText Tooltip;
+
+        public MartianDatagloveEffect(Action<Player, Projectile, NPC, int> effect, LocalizedText tooltip)
+        {
+            Effect = effect;
+            Tooltip = tooltip;
         }
     }
 }

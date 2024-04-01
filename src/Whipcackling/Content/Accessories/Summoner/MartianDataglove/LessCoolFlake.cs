@@ -19,13 +19,13 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
         {
             Projectile.CloneDefaults(ProjectileID.CoolWhipProj);
             Projectile.ArmorPenetration = 30;
+            Projectile.timeLeft = 60;
         }
 
         public override void PostAI()
         {
-            Main.NewText("-");
-            Main.NewText($"{Projectile.ai[0]} {Projectile.ai[1]} {Projectile.ai[2]}");
-            Main.NewText($"{Projectile.localAI[0]} {Projectile.localAI[1]} {Projectile.localAI[2]}");
+            if (Projectile.timeLeft < 60 - Projectile.ai[2])
+                Projectile.Kill();
         }
 
         public override bool PreDraw(ref Color lightColor)

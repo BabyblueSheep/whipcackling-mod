@@ -31,12 +31,6 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
             set => Projectile.localAI[0] = value ? 1 : 0;
         }
 
-        public static SoundStyle HolyAttackSound = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/HolyAttack", 3)
-        {
-            PitchVariance = 0.5f,
-            Volume = 0.7f
-        };
-
         public override void SetDefaults()
         {
             Projectile.width = 1;
@@ -73,11 +67,9 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                     );
                 }
 
-                Lighting.AddLight((int)(Projectile.Center.X / 16f), (int)(Projectile.Center.Y / 16f), 2, 2, 1.5f);
-                SoundEngine.PlaySound(HolyAttackSound, Projectile.Center);
-
                 Initialized = true;
             }
+            Lighting.AddLight((int)(Projectile.Center.X / 16f), (int)(Projectile.Center.Y / 16f), 2 * Projectile.timeLeft / 20f, 2 * Projectile.timeLeft / 20f, 1.5f * Projectile.timeLeft / 20f);
         }
 
         public override void ModifyHitNPC(NPC target, ref NPC.HitModifiers modifiers)
