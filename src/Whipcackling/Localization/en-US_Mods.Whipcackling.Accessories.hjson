@@ -10,7 +10,7 @@ IdolOfVitriol: {
 
 MartianDataglove: {
 	LessCoolFlake.DisplayName: Less Cool Flake
-	HolyAttack.DisplayName: Holy Attack
+	HolyAttack.DisplayName: Holy Blast
 	DisplayName: Martian Dataglove
 	Tooltip:
 		'''
@@ -28,4 +28,15 @@ MartianDataglove: {
 	DarkHarvestTooltip: "[i:ScytheWhip][c/abb6b7:Dark Harvest: Spreads dark energy when killing an enemy]"
 	MorningStarTooltip: "[i:MaceWhip][c/f6f9fa:Morning Star: Inflicts Crush Depth]"
 	KaleidoscopeTooltip: "[i:RainbowWhip][c/cfc2ed:Kaleidoscope: Creates 4 prismatic projectiles around the target]"
+}
+
+MoonStone: {
+	DisplayName: Moon Stone
+	Tooltip:
+		'''
+		Minions move and act faster, but deal 30% less damage
+		Minions passively charge a lunar attack whilst moving
+		When fully charged, they shoot out a celestial laser and a cluster of moon rocks
+		'One of the ancient relics'
+		'''
 }

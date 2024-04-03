@@ -131,8 +131,8 @@ namespace Whipcackling.Core.Particles
         /// <param name="layer">The draw layer.</param>
         public static void ClearParticles(int layer)
         {
-            for (int i = 0; i < _particles[layer].Count; i++)
-                _particles[layer][i].Clear();
+            foreach (KeyValuePair<int, List<Particle>> entry in _particles[layer])
+                entry.Value.Clear();
         }
 
         /// <summary>
@@ -140,9 +140,9 @@ namespace Whipcackling.Core.Particles
         /// </summary>
         public static void ClearParticles()
         {
-            for (int i = 0; i < _particles.Length; i++)
-                for (int j = 0; j < _particles[i].Count; j++)
-                    _particles[i][j].Clear();
+            for (int layer = 0; layer < _particles.Length; layer++)
+                foreach (KeyValuePair<int, List<Particle>> entry in _particles[layer])
+                    entry.Value.Clear();
         }
 
         // Go over every every particle instance to run its Update method, update its position with velocity, increase time and remove it if it expires. 

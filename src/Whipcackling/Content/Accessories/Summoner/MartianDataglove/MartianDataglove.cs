@@ -106,10 +106,26 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
 
     public class MartianDatagloveProjectile : GlobalProjectile
     {
-        public static SoundStyle HolyAttackSound = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/HolyAttack", 3)
+        public static SoundStyle HolyAttack = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/HolyAttack", 3)
         {
             PitchVariance = 0.5f,
             Volume = 0.7f
+        };
+
+        public static SoundStyle BoneBreak = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/BoneBreak", 4)
+        {
+            PitchVariance = 0.5f,
+            Volume = 0.7f
+        };
+
+        public static SoundStyle ShiningRainbow = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/ShiningRainbow", 3)
+        {
+            PitchVariance = 0.5f,
+        };
+
+        public static SoundStyle TheReap = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/TheReap", 3)
+        {
+            PitchVariance = 0.5f,
         };
 
         public static Dictionary<int, MartianDatagloveEffect> TagConversions { get; set; }
@@ -131,17 +147,18 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                 }
                 if ((counter - 1) % 3 != 0)
                     return;
+                SoundEngine.PlaySound(BoneBreak, target.Center);
                 int amount = (int)Math.Ceiling(buffTime / 60.0);
                 for (int i = 0; i < amount; i++)
                 {
                     Vector2 speed = new(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-0.9f, -1.1f));
-                    Projectile proj = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), target.Center - new Vector2(0, target.height * 0.75f), speed * 5, ProjectileID.Bone, (int)Math.Ceiling((double)whip.damage / amount), 0, whip.owner);
+                    Projectile proj = Projectile.NewProjectileDirect(whip.GetProjectileSource_FromThis(), target.Center - new Vector2(0, target.height * 0.75f), speed * 5, ProjectileID.Bone, (int)Math.Ceiling((double)whip.damage / amount), 0, whip.owner);
                     proj.ranged = false;
                 }
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.SpinalTapTooltip")));
             TagConversions.Add(BuffID.FlameWhipEnemyDebuff, new((owner, whip, target, buffTime) =>
             {
-                Projectile.NewProjectile(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ProjectileID.FireWhipProj, (int)Math.Ceiling((double)whip.damage * 0.5f * Math.Ceiling(buffTime / 240.0)), 0, whip.owner);
+                Projectile.NewProjectile(whip.GetProjectileSource_FromThis(), target.Center, Vector2.Zero, ProjectileID.FireWhipProj, (int)Math.Ceiling((double)whip.damage * 0.5f * Math.Ceiling(buffTime / 240.0)), 0, whip.owner);
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.FirecrackerTooltip")));
             TagConversions.Add(BuffID.CoolWhipNPCDebuff, new((owner, whip, target, buffTime) =>
             {
@@ -153,7 +170,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                     if (counter == 2)
                         return;
                 }
-                Projectile proj = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<LessCoolFlake>(), 5, 0, whip.owner, ai2: (float)Math.Ceiling(buffTime / 4f));
+                Projectile proj = Projectile.NewProjectileDirect(whip.GetProjectileSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<LessCoolFlake>(), 5, 0, whip.owner, ai2: (float)Math.Ceiling(buffTime / 4f));
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.CoolWhipTooltip")));
             TagConversions.Add(BuffID.SwordWhipNPCDebuff, new((owner, whip, target, buffTime) =>
             {
@@ -181,7 +198,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                 for (int npcCount = 0; npcCount < npcs.Count; npcCount++)
                 {
                     if (npcCount == 0)
-                        SoundEngine.PlaySound(HolyAttackSound, target.Center);
+                        SoundEngine.PlaySound(HolyAttack, target.Center);
                     if (npcCount == maxNPCs)
                         break;
                     NPC npc = npcs[npcCount];
@@ -226,6 +243,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                 {
                     PositionInWorld = target.Center,
                 });
+                SoundEngine.PlaySound(TheReap, target.Center);
 
                 List<NPC> npcs = new();
                 int maxNPCs = (int)Math.Ceiling(buffTime / 30f);
@@ -245,14 +263,23 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                     if (npcCount == maxNPCs)
                         break;
                     NPC npc = npcs[npcCount];
-                    Main.NewText(npc.whoAmI);
                     Projectile k = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ProjectileID.ScytheWhipProj, 100, 0, whip.owner, ai0: npc.whoAmI + 1);
                 }
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.DarkHarvestTooltip")));
             TagConversions.Add(BuffID.MaceWhipNPCDebuff, new((owner, whip, target, buffTime) => target.AddBuff(ModContent.BuffType<CrushDepth>(), buffTime), Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.MorningStarTooltip")));
             TagConversions.Add(BuffID.RainbowWhipNPCDebuff, new((owner, whip, target, buffTime) =>
             {
-                for (int i = 0; i < 4; i++)
+                int counter = 0;
+                for (int i = 0; i < whip.localNPCImmunity.Length; i++)
+                {
+                    if (whip.localNPCImmunity[i] == -1)
+                        counter++;
+                }
+                if ((counter - 1) % 4 != 0)
+                    return;
+                SoundEngine.PlaySound(ShiningRainbow, target.Center);
+                int amount = (int)Math.Ceiling(buffTime / 60.0);
+                for (int i = 0; i < amount; i++)
                 {
                     Vector2 velocity = Main.rand.NextVector2Circular(1f, 1f) + Main.rand.NextVector2CircularEdge(5f, 5f);
 

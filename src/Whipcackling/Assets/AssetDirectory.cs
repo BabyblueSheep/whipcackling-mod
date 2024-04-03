@@ -55,8 +55,11 @@ namespace Whipcackling.Assets
         public static class Effects
         {
             public static readonly Asset<Effect> BlackHole = ModContent.Request<Effect>($"{AssetPath}Effects/BlackHole", AssetRequestMode.ImmediateLoad);
+            public static readonly Asset<Effect> CalamitousOutline = ModContent.Request<Effect>($"{AssetPath}Effects/CalamitousOutline", AssetRequestMode.ImmediateLoad);
+            public static readonly Asset<Effect> FieryOutline = ModContent.Request<Effect>($"{AssetPath}Effects/FieryOutline", AssetRequestMode.ImmediateLoad);
             public static readonly Asset<Effect> FlameTrail = ModContent.Request<Effect>($"{AssetPath}Effects/FlameTrail", AssetRequestMode.ImmediateLoad);
             public static readonly Asset<Effect> MeldOutline = ModContent.Request<Effect>($"{AssetPath}Effects/MeldOutline", AssetRequestMode.ImmediateLoad);
+            public static readonly Asset<Effect> MoonOutline = ModContent.Request<Effect>($"{AssetPath}Effects/MoonOutline", AssetRequestMode.ImmediateLoad);
             public static readonly Asset<Effect> NegazoneEffect = ModContent.Request<Effect>($"{AssetPath}Effects/NegazoneEffect", AssetRequestMode.ImmediateLoad);
             public static readonly Asset<Effect> Particle = ModContent.Request<Effect>($"{AssetPath}Effects/Particle", AssetRequestMode.ImmediateLoad);
             public static readonly Asset<Effect> Pixelise = ModContent.Request<Effect>($"{AssetPath}Effects/Pixelise", AssetRequestMode.ImmediateLoad);

@@ -9,18 +9,21 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Whipcackling.Assets;
+using Whipcackling.Content.Accessories.Summoner;
 
 namespace Whipcackling.Content.Enchantments
 {
     public class Conquering : ModPlayer
     {
+        public const int CONQUERING_ID = 190;
+
         public override void Load()
         {
             ModLoader.GetMod("CalamityMod").Call(
                 "CreateEnchantment",
                 Language.GetOrRegister($"Mods.Whipcackling.Enchantments.Conquering.Name"),
                 Language.GetOrRegister($"Mods.Whipcackling.Enchantments.Conquering.Description"),
-                190,
+                CONQUERING_ID,
                 new Predicate<Item>((Item item) => item.IsEnchantable() && item.damage > 0 && item.CountsAsClass<SummonDamageClass>() && !item.IsWhip() && !item.sentry),
                 $"{AssetDirectory.AssetPath}Textures/Enchantments/Conquering"
             );
@@ -48,7 +51,7 @@ namespace Whipcackling.Content.Enchantments
 
     public class ConqueringMinion : GlobalProjectile
     {
-        public bool IsDivided;
+        public bool IsDivided { get; set; }
 
         public override bool InstancePerEntity => true;
 
@@ -66,27 +69,47 @@ namespace Whipcackling.Content.Enchantments
 
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
+            if (projectile.minion)
+            {
+                Player player = Main.player[projectile.owner];
+                if (Main.gameMenu || !player.active)
+                    return;
+                if (source is not EntitySource_ItemUse || player.ActiveItem().accessory)
+                    return;
+                if (player.ActiveItem().Calamity().AppliedEnchantment is null)
+                    return;
+
+                if (player.ActiveItem().Calamity().AppliedEnchantment.Value.ID == Conquering.CONQUERING_ID)
+                {
+                    projectile.minionSlots /= 3f;
+                    player.statLife -= 5;
+                    player.statMana -= 5;
+                    if (player.statLife <= 0)
+                    {
+                        player.KillMe(PlayerDeathReason.ByCustomReason(Language.GetOrRegister($"Mods.Whipcackling.Enchantments.Conquering.DeathReason").Format(player.name)), 5, 0, false);
+                    }
+                    IsDivided = true;
+                }
+            }
+            else if (ProjectileID.Sets.MinionShot[projectile.type])
+            {
+                if (source is EntitySource_Parent parentSource && parentSource.Entity is Projectile proj && proj.minion && proj.GetGlobalProjectile<ConqueringMinion>().IsDivided)
+                {
+                    IsDivided = true;
+                }
+            }
+        }
+
+        public override bool PreAI(Projectile projectile)
+        {
             if (!projectile.minion && !projectile.sentry)
-                return;
+                return true;
             Player player = Main.player[projectile.owner];
             if (Main.gameMenu || !player.active)
-                return;
-            if (source is not EntitySource_ItemUse || player.ActiveItem().accessory)
-                return;
-            if (player.ActiveItem().Calamity().AppliedEnchantment is null)
-                return;
-
-            if (player.ActiveItem().Calamity().AppliedEnchantment.Value.ID == 190)
-            {
-                projectile.minionSlots /= 3f;
-                player.statLife -= 5;
-                player.statMana -= 5;
-                if (player.statLife <= 0)
-                {
-                    player.KillMe(PlayerDeathReason.ByCustomReason(Language.GetOrRegister($"Mods.Whipcackling.Enchantments.Conquering.DeathReason").Format(player.name)), 5, 0, false);
-                }
-                IsDivided = true;
-            }
+                return true;
+            if (IsDivided)
+                projectile.damage = (int)player.GetTotalDamage(projectile.DamageType).ApplyTo(projectile.originalDamage * 0.25f);
+            return true;
         }
 
         public override void SendExtraAI(Projectile projectile, BitWriter bitWriter, BinaryWriter binaryWriter)
@@ -97,15 +120,6 @@ namespace Whipcackling.Content.Enchantments
         public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader binaryReader)
         {
             IsDivided = binaryReader.ReadBoolean();
-        }
-
-        public override bool PreAI(Projectile projectile)
-        {
-            if (IsDivided)
-            {
-                projectile.damage = (int)Math.Ceiling(projectile.originalDamage * 0.25f);
-            }
-            return true;
         }
 
         private void ConqueringSmallerMinions(ILContext il)
@@ -119,7 +133,7 @@ namespace Whipcackling.Content.Enchantments
             {
                 if (item.Calamity().AppliedEnchantment is null)
                     return slots;
-                float modifier = item.Calamity().AppliedEnchantment.Value.ID == 190 ? 3f : 1;
+                float modifier = item.Calamity().AppliedEnchantment.Value.ID == Conquering.CONQUERING_ID ? 3f : 1;
                 return slots / modifier;
             });
         }

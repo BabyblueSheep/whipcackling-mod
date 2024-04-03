@@ -120,7 +120,9 @@ namespace Whipcackling.Content.Whips.MeldWhip
         private void PrepareRenderTarget()
         {
             bool shouldDraw = false;
-            _shouldDrawTargets = new bool[6];
+            _shouldDrawTargets ??= new bool[6];
+            for (int i = 0; i < 6; i++)
+                _shouldDrawTargets[i] = false;
             for (int i = 0; i < Main.npc.Length; i++)
             {
                 NPC npc = Main.npc[i];
@@ -134,7 +136,6 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     layer = npc.behindTiles ? 2 : 3;
                 _shouldDrawTargets[layer] = true;
                 shouldDraw = true;
-                break;
             }
 
             if (!shouldDraw)
@@ -148,6 +149,8 @@ namespace Whipcackling.Content.Whips.MeldWhip
             }
 
             int pastLayer = -1;
+            Matrix matrixTransformation = Main.GameViewMatrix.TransformationMatrix;
+            Vector2 zoom = Main.GameViewMatrix.Zoom;
             for (int i = 0; i < Main.npc.Length; i++)
             {
                 NPC npc = Main.npc[i];
@@ -173,11 +176,15 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 Matrix matrix = Matrix.CreateScale(size, size, 1);
                 matrix *= Matrix.CreateTranslation(-offset.X, -offset.Y, 0);
                 matrix *= Matrix.CreateTranslation(-npc.width * (size - 1) / 2, -npc.height * (size - 1) / 2, 0);
+                Main.GameViewMatrix._transformationMatrix = matrix;
+                Main.GameViewMatrix._zoom = new Vector2(1, 1);
 
-                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, matrix);
+                Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
                 Main.instance.DrawNPCDirect(Main.spriteBatch, npc, false, Main.screenPosition);
                 Main.spriteBatch.End();
             }
+            Main.GameViewMatrix._transformationMatrix = matrixTransformation;
+            Main.GameViewMatrix._zoom = zoom;
             device.SetRenderTarget(null);
         }
 
@@ -190,30 +197,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 return;
             }
 
-            Effect effect = AssetDirectory.Effects.MeldOutline.Value;
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
-
-            for (float i = 0; i < 3; i++)
-            {
-                Color color = i switch
-                {
-                    0 => Color.White,
-                    1 => Color.SpringGreen,
-                    _ => Color.Cyan,
-                };
-                effect.Parameters["uColor"].SetValue(color.ToVector4());
-                effect.CurrentTechnique.Passes[0].Apply();
-
-                float angle = Main.GlobalTimeWrappedHourly * 5 + i / 3 * MathHelper.TwoPi;
-                Vector2 offset = new((float)Math.Cos(angle), (float)Math.Sin(angle));
-                Main.spriteBatch.Draw(RenderTargets[layer], Main.screenLastPosition - Main.screenPosition + offset * 2, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
-            }
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
-            Main.pixelShader.CurrentTechnique.Passes[0].Apply();
+            DrawOutlinesDirect(layer);
 
             orig(self, behindTiles);
         }
@@ -227,7 +211,15 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 return;
             }
 
+            DrawOutlinesDirect(layer);
+
+            orig(self, npcCache, behindTiles);
+        }
+
+        public void DrawOutlinesDirect(int layer)
+        {
             Effect effect = AssetDirectory.Effects.MeldOutline.Value;
+            effect.Parameters["uAmount"].SetValue(1);
 
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null, Main.GameViewMatrix.TransformationMatrix);
@@ -251,8 +243,6 @@ namespace Whipcackling.Content.Whips.MeldWhip
             Main.spriteBatch.End();
             Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
             Main.pixelShader.CurrentTechnique.Passes[0].Apply();
-
-            orig(self, npcCache, behindTiles);
         }
     }
 }
