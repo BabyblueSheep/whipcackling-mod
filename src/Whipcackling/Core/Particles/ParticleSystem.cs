@@ -102,7 +102,7 @@ namespace Whipcackling.Core.Particles
                 return;
 
             ModParticle particleType = ParticleLoader.particles[type];
-            Asset<Texture2D> texture = ModContent.Request<Texture2D>(particleType.Texture, AssetRequestMode.ImmediateLoad);
+            Asset<Texture2D> texture = ModContent.Request<Texture2D>(particleType.Texture);
 
             List<Particle> particles = _particles[(int)particleType.DrawLayer][type];
 

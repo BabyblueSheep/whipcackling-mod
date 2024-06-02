@@ -12,6 +12,7 @@ namespace Whipcackling.Content.Enchantments
 {
     public class ConqueringMinionDrawing : MinionDrawingSystem
     {
+        public override float Size => 1.2f;
         public override bool AppliesTo(Projectile projectile) => projectile.GetGlobalProjectile<ConqueringMinion>().IsDivided;
 
         public override void DrawEffectsAfter(int layer, bool startSpriteBatch)

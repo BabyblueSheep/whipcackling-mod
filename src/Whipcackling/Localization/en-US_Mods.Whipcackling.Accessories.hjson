@@ -2,8 +2,8 @@ IdolOfVitriol: {
 	DisplayName: Idol Of Vitriol
 	Tooltip:
 		'''
-		Melee minion attacks have decreased immunity frames
-		Minions have a chance to burn enemies
+		Newly summoned minion melee attacks have decreased immunity frames
+		Newly summoned minions also have a chance to burn enemies
 		Provides 3 seconds of immunity to lava
 		'''
 }
@@ -34,9 +34,12 @@ MoonStone: {
 	DisplayName: Moon Stone
 	Tooltip:
 		'''
-		Minions move and act faster, but deal 30% less damage
-		Minions passively charge a lunar attack whilst moving
-		When fully charged, they shoot out a celestial laser and a cluster of moon rocks
+		Newly summoned minions move and act faster, but deal 30% less damage
+		Newly summoned minions also passively charge a lunar action whilst moving
+		When fully charged, they will do a lunar action if they're attacking an enemy
 		'One of the ancient relics'
 		'''
+	ExodiumBeam.DisplayName: Exodium Super Laser Power Beam
+	ExodiumHeal.DisplayName: Exodium Healing Aura
+	ExodiumRock.DisplayName: Exodium Rock
 }

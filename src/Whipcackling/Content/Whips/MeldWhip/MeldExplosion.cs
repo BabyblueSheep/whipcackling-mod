@@ -41,7 +41,8 @@ namespace Whipcackling.Content.Whips.MeldWhip
         {
             PitchVariance = 0.5f,
             Pitch = 0.2f,
-            Volume = 0.4f
+            Volume = 0.4f,
+            MaxInstances = 0,
         };
 
         public static SoundStyle BigExplosion = new($"{AssetDirectory.AssetPath}Sounds/Whips/MeldWhip/BigExplosion")
@@ -49,18 +50,20 @@ namespace Whipcackling.Content.Whips.MeldWhip
             PitchVariance = 0.5f,
             Pitch = 0.3f,
             Volume = 1f,
+            MaxInstances = 0,
         };
 
         public static SoundStyle Droning = new($"{AssetDirectory.AssetPath}Sounds/Whips/MeldWhip/Droning")
         {
             IsLooped = true,
-            Volume = 1.3f
+            Volume = 1.3f,
+            MaxInstances = 0,
         };
 
         private SlotId _droningSlot;
 
         private Vector2 _offset;
-
+        VertexStrip _strip;
         private FastNoiseLite _noise;
 
         public override void SetDefaults()
@@ -76,15 +79,14 @@ namespace Whipcackling.Content.Whips.MeldWhip
             Projectile.hide = true;
             Projectile.usesIDStaticNPCImmunity = true;
             Projectile.idStaticNPCHitCooldown = 30;
-
-            _noise = new(Main.rand.Next(99999));
-            _noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
         }
 
         public override void AI()
         {
             if (!Initialized)
             {
+                _noise = new(Main.rand.Next(99999));
+                _noise.SetNoiseType(FastNoiseLite.NoiseType.OpenSimplex2);
                 _offset = new Vector2(Main.rand.NextFloat(0, 1), Main.rand.NextFloat(0, 1));
 
                 if (Strength < 3)
@@ -321,8 +323,10 @@ namespace Whipcackling.Content.Whips.MeldWhip
 
         public void DrawPixelated()
         {
+            if (!Initialized)
+                return;
             #region Shockwave
-            VertexStrip shockwave = new();
+            _strip ??= new();
 
             Vector2[] positions = new Vector2[129];
             float[] rotations = new float[129];
@@ -342,7 +346,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
             Color ShockwaveColor(float p) => Color.White;
             float ShockwaveWidth(float p) => (8 + (float)Math.Pow(1.5f, Strength)) * Utils.GetLerpValue(20, 5, Timer, true) * Utils.GetLerpValue(0, 5, Timer, true);
 
-            shockwave.PrepareStrip(positions, rotations, ShockwaveColor, ShockwaveWidth, -Main.screenPosition, 129, true);
+            _strip.PrepareStrip(positions, rotations, ShockwaveColor, ShockwaveWidth, -Main.screenPosition, 129, true);
 
             Effect effect = AssetDirectory.Effects.ShockwaveTrail.Value;
             effect.Parameters["uTransformMatrix"].SetValue(Main.GameViewMatrix.NormalizedTransformationmatrix);
@@ -350,10 +354,11 @@ namespace Whipcackling.Content.Whips.MeldWhip
 
             effect.Parameters["uTextureNoise0"].SetValue(AssetDirectory.Textures.Extra.Noise.CirclyNoise.Value);
             effect.Parameters["uTexturePalette0"].SetValue(AssetDirectory.Textures.Extra.Palettes.ShockwavePalette.Value);
+            effect.Parameters["uTexturePalette1"].SetValue(AssetDirectory.Textures.Extra.Palettes.ShockwavePaletteAlpha.Value);
 
 
             effect.CurrentTechnique.Passes[0].Apply();
-            shockwave.DrawTrail();
+            _strip.DrawTrail();
             Main.pixelShader.CurrentTechnique.Passes[0].Apply();
 
             #endregion

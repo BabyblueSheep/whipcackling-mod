@@ -89,6 +89,7 @@ namespace Whipcackling.Content.Enchantments
                         player.KillMe(PlayerDeathReason.ByCustomReason(Language.GetOrRegister($"Mods.Whipcackling.Enchantments.Conquering.DeathReason").Format(player.name)), 5, 0, false);
                     }
                     IsDivided = true;
+                    projectile.netUpdate = true;
                 }
             }
             else if (ProjectileID.Sets.MinionShot[projectile.type])
@@ -96,6 +97,7 @@ namespace Whipcackling.Content.Enchantments
                 if (source is EntitySource_Parent parentSource && parentSource.Entity is Projectile proj && proj.minion && proj.GetGlobalProjectile<ConqueringMinion>().IsDivided)
                 {
                     IsDivided = true;
+                    projectile.netUpdate = true;
                 }
             }
         }

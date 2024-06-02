@@ -1,6 +1,7 @@
 displayName = Whipcackling: Calamity Addon
 author = babybluesheep & Split
 version = 0.1
+homepage = https://github.com/BabyblueSheep/whipcackling-mod
 modReferences = CalamityMod
 hideCode = false
 hideResources = false

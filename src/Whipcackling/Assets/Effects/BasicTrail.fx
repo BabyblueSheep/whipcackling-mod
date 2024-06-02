@@ -1,32 +1,11 @@
 sampler2D uImage0 : register(s0);
 
 matrix uTransformMatrix;
-float2 uOffset;
 
-texture uTextureNoise0;
-sampler2D texture0 = sampler_state
-{
-    texture = <uTextureNoise0>;
-    magfilter = LINEAR;
-    minfilter = LINEAR;
-    mipfilter = LINEAR;
-    AddressU = wrap;
-    AddressV = wrap;
-};
 texture uTexturePalette0;
 sampler2D texturepal0 = sampler_state
 {
     texture = <uTexturePalette0>;
-    magfilter = POINT;
-    minfilter = POINT;
-    mipfilter = POINT;
-    AddressU = clamp;
-    AddressV = clamp;
-};
-texture uTexturePalette1;
-sampler2D texturepal1 = sampler_state
-{
-    texture = <uTexturePalette1>;
     magfilter = POINT;
     minfilter = POINT;
     mipfilter = POINT;
@@ -59,14 +38,12 @@ VertexShaderOutput VertexShaderFunction(in VertexShaderInput input)
 
 float4 PixelShaderFunction(VertexShaderOutput input) : COLOR0
 {
-    float4 noise = tex2D(texture0, float2(input.Coord.x + uOffset.x, uOffset.y));
-    float4 alpha = tex2D(texturepal0, float2(input.Coord.y, 0));
-    return tex2D(texturepal1, float2(noise.r * alpha.a, 0));
+    return tex2D(texturepal0, input.Coord) * input.Color;
 }
 
 technique Technique1
 {
-    pass ShockwaveTrailPass
+    pass BasicTrailPass
     {
         PixelShader = compile ps_3_0 PixelShaderFunction();
         VertexShader = compile vs_3_0 VertexShaderFunction();

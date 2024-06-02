@@ -55,12 +55,12 @@ namespace Whipcackling.Common.Systems.Drawing
             if (Main.instance.DrawCacheProjsBehindNPCs.Contains(i))
                 return 1;
             if (Main.instance.DrawCacheProjsBehindProjectiles.Contains(i))
-                return 3;
+                return 2;
             if (Main.instance.DrawCacheProjsOverPlayers.Contains(i))
                 return 4;
             if (Main.instance.DrawCacheProjsOverWiresUI.Contains(i))
                 return 5;
-            return 2;
+            return 3;
         }
 
         public static int DetermineDrawLayer(List<int> list)
@@ -70,12 +70,12 @@ namespace Whipcackling.Common.Systems.Drawing
             if (list == Main.instance.DrawCacheProjsBehindNPCs)
                 return 1;
             if (list == Main.instance.DrawCacheProjsBehindProjectiles)
-                return 3;
+                return 2;
             if (list == Main.instance.DrawCacheProjsOverPlayers)
                 return 4;
             if (list == Main.instance.DrawCacheProjsOverWiresUI)
                 return 5;
-            return 2;
+            return 3;
         }
 
         private void PrepareRenderTarget()
@@ -92,7 +92,7 @@ namespace Whipcackling.Common.Systems.Drawing
                 if (!AppliesTo(projectile))
                     continue;
                 int layer = DetermineDrawLayer(i);
-                if (projectile.hide && layer == 2)
+                if (projectile.hide && layer == 3)
                     continue;
 
                 _shouldDrawTargets[layer] = true;
@@ -121,7 +121,7 @@ namespace Whipcackling.Common.Systems.Drawing
                     continue;
 
                 int currentLayer = DetermineDrawLayer(i);
-                if (projectile.hide && currentLayer == 2)
+                if (projectile.hide && currentLayer == 3)
                     continue;
 
                 if (currentLayer != pastLayer)
@@ -130,7 +130,7 @@ namespace Whipcackling.Common.Systems.Drawing
                     device.SetRenderTarget(RenderTargets[pastLayer]);
                 }
 
-                float size = 1.2f;
+                float size = Size;
                 Vector2 offset = projectile.position - Main.screenPosition;
                 offset *= size - 1;
 
@@ -166,7 +166,7 @@ namespace Whipcackling.Common.Systems.Drawing
 
         private void DrawEffects(On_Main.orig_DrawProjectiles orig, Main self)
         {
-            int layer = 2;
+            int layer = 3;
             if (!_shouldDrawTargets[layer])
             {
                 orig(self);
@@ -178,6 +178,7 @@ namespace Whipcackling.Common.Systems.Drawing
             DrawEffectsAfter(layer, true);
         }
 
+        public abstract float Size { get; }
         public abstract bool AppliesTo(Projectile projectile);
 
         public abstract void DrawEffectsBehind(int layer, bool startSpriteBatch);

@@ -109,23 +109,27 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
         public static SoundStyle HolyAttack = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/HolyAttack", 3)
         {
             PitchVariance = 0.5f,
-            Volume = 0.7f
+            Volume = 0.7f,
+            MaxInstances = 0,
         };
 
         public static SoundStyle BoneBreak = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/BoneBreak", 4)
         {
             PitchVariance = 0.5f,
-            Volume = 0.7f
+            Volume = 0.7f,
+            MaxInstances = 0,
         };
 
         public static SoundStyle ShiningRainbow = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/ShiningRainbow", 3)
         {
             PitchVariance = 0.5f,
+            MaxInstances = 0,
         };
 
         public static SoundStyle TheReap = new($"{AssetDirectory.AssetPath}Sounds/MartianDataglove/TheReap", 3)
         {
             PitchVariance = 0.5f,
+            MaxInstances = 0,
         };
 
         public static Dictionary<int, MartianDatagloveEffect> TagConversions { get; set; }

@@ -131,6 +131,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 if (!npc.HasBuff<MeldWhipNPCDebuffSuper>())
                     continue;
 
+
                 int layer = DetermineDrawLayer(i);
                 if (layer == -1)
                     layer = npc.behindTiles ? 2 : 3;

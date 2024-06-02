@@ -10,10 +10,12 @@ using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Content.Enchantments;
 
-namespace Whipcackling.Content.Accessories.Summoner
+namespace Whipcackling.Content.Accessories.Summoner.MoonStone
 {
     public class MoonMinionDrawing : MinionDrawingSystem
     {
+        public override float Size => 1.1f;
+
         public override bool AppliesTo(Projectile projectile)
         {
             return projectile.GetGlobalProjectile<MoonStoneProjectile>().IsLunar;

@@ -12,6 +12,7 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
+using Whipcackling.Common.Systems.Drawing;
 
 namespace Whipcackling.Content.Accessories.Summoner
 {
@@ -59,11 +60,14 @@ namespace Whipcackling.Content.Accessories.Summoner
                 Player player = Main.player[projectile.owner];
                 if (Main.gameMenu || !player.active)
                     return;
+                if (projectile.hide && MinionDrawingSystem.DetermineDrawLayer(projectile.whoAmI) == 2)
+                    return;
                 if (player.GetModPlayer<IdolOfVitriolPlayer>().IdolOfVitriol)
                 {
                     IsVitriolic = true;
                     projectile.localNPCHitCooldown = (int)Math.Floor(projectile.localNPCHitCooldown * 0.9f);
                     projectile.idStaticNPCHitCooldown = (int)Math.Floor(projectile.idStaticNPCHitCooldown * 0.9f);
+                    projectile.netUpdate = true;
                 }
             }
             else if (ProjectileID.Sets.MinionShot[projectile.type] || ProjectileID.Sets.SentryShot[projectile.type])
@@ -73,6 +77,7 @@ namespace Whipcackling.Content.Accessories.Summoner
                     IsVitriolic = true;
                     projectile.localNPCHitCooldown = (int)Math.Floor(projectile.localNPCHitCooldown * 0.9f);
                     projectile.idStaticNPCHitCooldown = (int)Math.Floor(projectile.idStaticNPCHitCooldown * 0.9f);
+                    projectile.netUpdate = true;
                 }
             }
         }

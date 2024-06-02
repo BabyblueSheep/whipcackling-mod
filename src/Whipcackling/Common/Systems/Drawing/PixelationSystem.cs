@@ -51,7 +51,7 @@ namespace Whipcackling.Common.Systems.Drawing
             if (!_shouldDraw)
                 return;
 
-            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
+            Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.NonPremultiplied, Main.DefaultSamplerState, DepthStencilState.None, RasterizerState.CullNone, null);
 
             GraphicsDevice device = Main.instance.GraphicsDevice;
             device.SetRenderTarget(PixelationTarget);
