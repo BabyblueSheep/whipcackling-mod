@@ -15,7 +15,7 @@ namespace Whipcackling
     {
         public override void Load()
         {
-            CooldownRegistry.RegisterModCooldowns(this);
+            
         }
 
         public override void PostSetupContent()
@@ -34,8 +34,7 @@ namespace Whipcackling
         private void RegisterScreenFilter(Asset<Effect> shader, EffectPriority priority = EffectPriority.High)
         {
             string name = shader.Name.Split('\\')[^1];
-            Ref<Effect> effect = new(shader.Value);
-            Filters.Scene[$"Whipcackling:{name}"] = new Filter(new(effect, $"{name}Pass"), priority);
+            Filters.Scene[$"Whipcackling:{name}"] = new Filter(new(shader, $"{name}Pass"), priority);
             Filters.Scene[$"Whipcackling:{name}"].Load();
         }
 

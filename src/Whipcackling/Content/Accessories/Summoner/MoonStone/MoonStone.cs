@@ -1,10 +1,14 @@
-﻿using CalamityMod.Items;
+﻿using CalamityMod;
+using CalamityMod.Balancing;
+using CalamityMod.Items;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoMod.Cil;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Terraria;
 using Terraria.Audio;
 using Terraria.DataStructures;
@@ -57,11 +61,44 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
             MaxInstances = 0,
         };
 
-        public bool IsLunar { get; set; }
         public float LunarAttackCharge { get; set; }
         public bool LunarIsAttacking { get; set; }
+        public bool ValidLunar { get; set; }
 
         public override bool InstancePerEntity => true;
+
+        public override void Load()
+        {
+            IL_Projectile.Update += MoreUpdatesIfMoonStone;
+        }
+
+        public override void Unload()
+        {
+            IL_Projectile.Update -= MoreUpdatesIfMoonStone;
+        }
+
+        private static void MoreUpdatesIfMoonStone(ILContext il)
+        {
+            ILCursor? cursor = new(il);
+
+            FieldInfo? numUpdatesField = typeof(Projectile).GetField("numUpdates", BindingFlags.Public | BindingFlags.Instance);
+            if (!cursor.TryGotoNext(MoveType.After, i => i.MatchStfld(numUpdatesField)))
+                return;
+
+            cursor.EmitLdarg0();
+            cursor.EmitLdarg0();
+            cursor.EmitLdfld(numUpdatesField);
+            cursor.EmitDelegate((Projectile projectile, int numUpdates) =>
+            {
+                if ((projectile.minion || projectile.sentry || ProjectileID.Sets.MinionShot[projectile.type] || ProjectileID.Sets.SentryShot[projectile.type]) && Main.player[projectile.owner].GetModPlayer<MoonStonePlayer>().MoonStone && projectile.GetGlobalProjectile<MoonStoneProjectile>().ValidLunar)
+                {
+                    if (projectile.extraUpdates == 0)
+                        projectile.numUpdates += 1;
+                    else
+                        projectile.numUpdates = (int)Math.Ceiling(projectile.numUpdates * 1.2f);
+                }
+            });
+        }
 
         public override void OnSpawn(Projectile projectile, IEntitySource source)
         {
@@ -73,27 +110,8 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
                 Main.instance.CacheProjDraws();
                 if (projectile.hide && MinionDrawingSystem.DetermineDrawLayer(projectile.whoAmI) == 3)
                     return;
-                if (player.GetModPlayer<MoonStonePlayer>().MoonStone)
-                {
-                    IsLunar = true;
-                    if (projectile.extraUpdates == 0)
-                        projectile.extraUpdates += 1;
-                    else
-                        projectile.extraUpdates = (int)Math.Ceiling(projectile.extraUpdates * 1.2f);
-                }
-            }
-            else if (ProjectileID.Sets.MinionShot[projectile.type] || ProjectileID.Sets.SentryShot[projectile.type])
-            {
-                if (projectile.type == ModContent.ProjectileType<ExodiumRock>())
-                    return;
-                if (source is EntitySource_Parent parentSource && parentSource.Entity is Projectile proj && (proj.minion || proj.sentry) && proj.GetGlobalProjectile<MoonStoneProjectile>().IsLunar)
-                {
-                    IsLunar = true;
-                    if (projectile.extraUpdates == 0)
-                        projectile.extraUpdates += 1;
-                    else
-                        projectile.extraUpdates = (int)Math.Ceiling(projectile.extraUpdates * 1.2f);
-                }
+                ValidLunar = true;
+                projectile.netUpdate = true;
             }
         }
 
@@ -104,11 +122,17 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
             Player owner = Main.player[projectile.owner];
             if (Main.gameMenu || !owner.active)
                 return;
-            if (IsLunar && projectile.minion)
+            if (owner.GetModPlayer<MoonStonePlayer>().MoonStone)
+            {
+                if (projectile.minion || projectile.sentry || ProjectileID.Sets.MinionShot[projectile.type] || ProjectileID.Sets.SentryShot[projectile.type])
+                {
+                    projectile.damage = (int)owner.GetTotalDamage(projectile.DamageType).ApplyTo(projectile.originalDamage * 0.3f);
+                }
+            }
+            if (ValidLunar && projectile.minion && owner.GetModPlayer<MoonStonePlayer>().MoonStone)
             {
                 if (projectile.numUpdates != (projectile.extraUpdates) - 1)
                     return;
-                projectile.damage = (int)owner.GetTotalDamage(projectile.DamageType).ApplyTo(projectile.originalDamage * 0.3f);
                 projectile.position.X += projectile.velocity.X * 0.5f;
                 if (!projectile.tileCollide || projectile.velocity.Y < 0 || projectile.shouldFallThrough)
                     projectile.position.Y += projectile.velocity.Y * 0.5f;
@@ -228,14 +252,14 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
 
         public override void SendExtraAI(Projectile projectile, BitWriter bitWriter, BinaryWriter binaryWriter)
         {
-            binaryWriter.Write(IsLunar);
+            binaryWriter.Write(ValidLunar);
             binaryWriter.Write(LunarAttackCharge);
             binaryWriter.Write(LunarIsAttacking);
         }
 
         public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader binaryReader)
         {
-            IsLunar = binaryReader.ReadBoolean();
+            ValidLunar = binaryReader.ReadBoolean();
             LunarAttackCharge = binaryReader.ReadSingle();
             LunarIsAttacking = binaryReader.ReadBoolean();
         }
@@ -259,7 +283,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
                                 continue;
                             if (!projectile.minion)
                                 continue;
-                            if (!projectile.GetGlobalProjectile<MoonStoneProjectile>().IsLunar)
+                            if (!Main.player[projectile.owner].GetModPlayer<MoonStonePlayer>().MoonStone)
                                 continue;
 
                             Vector2 position = projectile.Center;

@@ -2,8 +2,8 @@ IdolOfVitriol: {
 	DisplayName: Idol Of Vitriol
 	Tooltip:
 		'''
-		Newly summoned minion melee attacks have decreased immunity frames
-		Newly summoned minions also have a chance to burn enemies
+		Minion melee attacks have decreased immunity frames
+		Minions also have a chance to burn enemies
 		Provides 3 seconds of immunity to lava
 		'''
 }
@@ -31,11 +31,11 @@ MartianDataglove: {
 }
 
 MoonStone: {
-	DisplayName: Moon Stone
+	DisplayName: Space Stone
 	Tooltip:
 		'''
-		Newly summoned minions move and act faster, but deal 30% less damage
-		Newly summoned minions also passively charge a lunar action whilst moving
+		Minions move and act faster, but deal 30% less damage
+		Minions also passively charge a lunar action whilst moving
 		When fully charged, they will do a lunar action if they're attacking an enemy
 		'One of the ancient relics'
 		'''

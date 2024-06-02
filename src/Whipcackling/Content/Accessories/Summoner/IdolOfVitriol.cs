@@ -49,60 +49,21 @@ namespace Whipcackling.Content.Accessories.Summoner
 
     public class IdolOfVitriolProjectile : GlobalProjectile
     {
-        public bool IsVitriolic { get; set; }
 
-        public override bool InstancePerEntity => true;
-
-        public override void OnSpawn(Projectile projectile, IEntitySource source)
-        {
-            if (projectile.minion && !projectile.sentry)
-            {
-                Player player = Main.player[projectile.owner];
-                if (Main.gameMenu || !player.active)
-                    return;
-                if (projectile.hide && MinionDrawingSystem.DetermineDrawLayer(projectile.whoAmI) == 2)
-                    return;
-                if (player.GetModPlayer<IdolOfVitriolPlayer>().IdolOfVitriol)
-                {
-                    IsVitriolic = true;
-                    projectile.localNPCHitCooldown = (int)Math.Floor(projectile.localNPCHitCooldown * 0.9f);
-                    projectile.idStaticNPCHitCooldown = (int)Math.Floor(projectile.idStaticNPCHitCooldown * 0.9f);
-                    projectile.netUpdate = true;
-                }
-            }
-            else if (ProjectileID.Sets.MinionShot[projectile.type] || ProjectileID.Sets.SentryShot[projectile.type])
-            {
-                if (source is EntitySource_Parent parentSource && parentSource.Entity is Projectile proj && (proj.minion || proj.sentry) && proj.GetGlobalProjectile<IdolOfVitriolProjectile>().IsVitriolic)
-                {
-                    IsVitriolic = true;
-                    projectile.localNPCHitCooldown = (int)Math.Floor(projectile.localNPCHitCooldown * 0.9f);
-                    projectile.idStaticNPCHitCooldown = (int)Math.Floor(projectile.idStaticNPCHitCooldown * 0.9f);
-                    projectile.netUpdate = true;
-                }
-            }
-        }
-
-        public override void ModifyHitNPC(Projectile projectile, NPC target, ref NPC.HitModifiers modifiers)
+        public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (!(projectile.minion || ProjectileID.Sets.MinionShot[projectile.type] || projectile.sentry || ProjectileID.Sets.SentryShot[projectile.type]))
                 return;
-            if (IsVitriolic)
+            if (Main.player[projectile.owner].GetModPlayer<IdolOfVitriolPlayer>().IdolOfVitriol)
             {
+                projectile.localNPCImmunity[target.whoAmI] = (int)Math.Ceiling(projectile.localNPCHitCooldown * 0.9f);
+                Projectile.perIDStaticNPCImmunity[projectile.type][target.whoAmI] = Main.GameUpdateCount + (uint)Math.Ceiling(projectile.idStaticNPCHitCooldown * 0.9f);
                 if (Main.rand.Next(10) == 0)
                 {
                     target.AddBuff(BuffID.OnFire, 60);
                 }
+                projectile.netUpdate = true;
             }
-        }
-
-        public override void SendExtraAI(Projectile projectile, BitWriter bitWriter, BinaryWriter binaryWriter)
-        {
-            binaryWriter.Write(IsVitriolic);
-        }
-
-        public override void ReceiveExtraAI(Projectile projectile, BitReader bitReader, BinaryReader binaryReader)
-        {
-            IsVitriolic = binaryReader.ReadBoolean();
         }
     }
 

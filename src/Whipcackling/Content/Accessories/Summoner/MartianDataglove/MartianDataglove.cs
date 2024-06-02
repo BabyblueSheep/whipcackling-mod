@@ -157,7 +157,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                 {
                     Vector2 speed = new(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-0.9f, -1.1f));
                     Projectile proj = Projectile.NewProjectileDirect(whip.GetProjectileSource_FromThis(), target.Center - new Vector2(0, target.height * 0.75f), speed * 5, ProjectileID.Bone, (int)Math.Ceiling((double)whip.damage / amount), 0, whip.owner);
-                    proj.ranged = false;
+                    proj.ranged = false/* tModPorter Suggestion: Remove. See Item.DamageType */;
                 }
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.SpinalTapTooltip")));
             TagConversions.Add(BuffID.FlameWhipEnemyDebuff, new((owner, whip, target, buffTime) =>
