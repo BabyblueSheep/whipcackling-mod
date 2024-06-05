@@ -26,7 +26,7 @@ namespace Whipcackling.Content.Whips.NuclearWhip
         public static float WhipRangeMultiplier => 2f;
 
         //The amount of segments on the whip. Practically visual.
-        public static int WhipSegments => 30;
+        public static int WhipSegments => 35;
 
         //The additive tag damage of the whip.
         public static int TagDamage(int enemiesTagged) => 20 + 5 * (int)Math.Ceiling(Math.Pow(enemiesTagged, 0.3));

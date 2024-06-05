@@ -44,3 +44,43 @@ NuclearWhip: {
 
 	NuclearWhipProjectile.DisplayName: Plutonium Hunger
 }
+
+StratusWhip: {
+	StratusWhip: {
+		DisplayName: Orion's Belt
+		Tooltip:
+			'''
+			{$CommonItemTooltip.Whips}
+			Strike enemies with star power
+			Star power can be stacked up to 5 times
+			Star power is unleashed when hit by minions
+			'''
+	}
+
+	StratusWhipProjectile.DisplayName: Orion's Belt
+
+	StratusWhipNPCDebuffBlue: {
+		DisplayName: Blue Dwarf Tag
+		Description: wait this shouldnt exist what
+	}
+
+	StratusWhipNPCDebuffPurple: {
+		DisplayName: Purple Dwarf Tag
+		Description: ????????????? poison star
+	}
+
+	StratusWhipNPCDebuffRed: {
+		DisplayName: Red Dwarf Tag
+		Description: like zee blood i vomit every night
+	}
+
+	StratusWhipNPCDebuffWhite: {
+		DisplayName: White Dwarf Tag
+		Description: like zee
+	}
+
+	StratusWhipNPCDebuffYellow: {
+		DisplayName: Yellow Dwarf Tag
+		Description: like zee toilet lemonade
+	}
+}

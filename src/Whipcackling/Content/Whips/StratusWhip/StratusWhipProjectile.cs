@@ -1,6 +1,8 @@
 ﻿using CalamityMod.Buffs.DamageOverTime;
+using CalamityMod.Dusts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using NATUPNPLib;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Graphics;
@@ -10,21 +12,24 @@ using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
 using Whipcackling.Content.Whips.MeldWhip;
+using Whipcackling.Content.Whips.NuclearWhip;
 using Whipcackling.Core;
 
-namespace Whipcackling.Content.Whips.NuclearWhip
+namespace Whipcackling.Content.Whips.StratusWhip
 {
-    public class NuclearWhipProjectile : ModWhip, IDrawPixelated
+    public class StratusWhipProjectile : ModWhip, IDrawPixelated
     {
-        public override string LocalizationCategory => "Whips.NuclearWhip";
+        public override string LocalizationCategory => "Whips.StratusWhip";
 
         public override SoundStyle SwingSound => SoundID.Item153;
-        public override Color StringColor => new(140, 234, 87);
+        public override Color StringColor => new(47, 46, 100);
         public override int HandleOffset => 4;
 
-        private Vector2[] _prevPositionsSmoothed;
-        private float[] _prevRotationsSmoothed;
-        private VertexStrip _strip;
+        public readonly static int[] TagDebuffList = [ModContent.BuffType<StratusWhipNPCDebuffRed>(),
+                                                      ModContent.BuffType<StratusWhipNPCDebuffYellow>(),
+                                                      ModContent.BuffType<StratusWhipNPCDebuffBlue>(),
+                                                      ModContent.BuffType<StratusWhipNPCDebuffPurple>(),
+                                                      ModContent.BuffType<StratusWhipNPCDebuffWhite>()];
 
         private Vector2[,] _prevPositionsPlane;
         private Vector2[,] _prevPositionsPlaneSmoothed;
@@ -32,8 +37,8 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
         public override void SafeSetDefaults()
         {
-            Projectile.WhipSettings.Segments = ConstantsNuclear.WhipSegments;
-            Projectile.WhipSettings.RangeMultiplier = ConstantsNuclear.WhipRangeMultiplier;
+            Projectile.WhipSettings.Segments = ConstantsStratus.WhipSegments;
+            Projectile.WhipSettings.RangeMultiplier = ConstantsStratus.WhipRangeMultiplier;
             Projectile.extraUpdates = 2;
         }
 
@@ -48,12 +53,13 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
             if (progress > 0.1f)
             {
-                int id = DustID.CursedTorch;
-                Rectangle rectangle = Utils.CenteredRectangle(Projectile.WhipPointsForCollision[^1], new Vector2(30f));
-                Dust dust = Dust.NewDustDirect(rectangle.TopLeft(), rectangle.Width, rectangle.Height, id, 0f, 0f, 100, Color.White, progress);
+                int id = Main.rand.NextBool() ? (int)CalamityDusts.BlueCosmilite : (int)CalamityDusts.PurpleCosmilite;
+                Rectangle rectangle = Utils.CenteredRectangle(Projectile.WhipPointsForCollision[^2], new Vector2(30f));
+                Dust dust = Dust.NewDustDirect(rectangle.TopLeft(), rectangle.Width, rectangle.Height, id, 0f, 0f, 0, Color.White, progress);
                 dust.noGravity = true;
-                dust.velocity *= 1.5f;
-                dust.scale *= 0.9f + Main.rand.NextFloat() * 0.9f;
+                dust.velocity *= 0.8f;
+                dust.scale *= 1.2f + Main.rand.NextFloat() * 0.5f;
+                dust.fadeIn = progress;
             }
 
             #region Previous positions
@@ -88,21 +94,23 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
-            Projectile.damage = (int)(Projectile.damage * (1f - ConstantsNuclear.DamageFalloff));
+            Projectile.damage = (int)(Projectile.damage * (1f - ConstantsStratus.DamageFalloff));
 
-            target.AddBuff(ModContent.BuffType<SulphuricPoisoning>(), 240);
-            target.AddBuff(ModContent.BuffType<NuclearWhipNPCDebuff>(), ConstantsNuclear.TagDuration);
-        }
-
-        public override void OnHitPlayer(Player target, Player.HurtInfo info)
-        {
-            target.AddBuff(ModContent.BuffType<SulphuricPoisoning>(), 240);
+            for (int i = 0; i < TagDebuffList.Length; i++)
+            {
+                int debuff = TagDebuffList[i];
+                if (target.HasBuff(debuff))
+                {
+                    target.AddBuff(debuff, ConstantsStratus.TagDuration);
+                }
+            }
+            int randomDebuff = Main.rand.NextFromList(TagDebuffList);
+            target.AddBuff(randomDebuff, ConstantsStratus.TagDuration);
         }
 
         public void DrawPixelated()
         {
             _plane ??= new VertexPlane();
-            _strip ??= new VertexStrip();
 
             float timeToFlyOut = Main.player[Projectile.owner].itemAnimationMax * Projectile.MaxUpdates;
             float ratio = Timer / timeToFlyOut;
@@ -110,12 +118,9 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
             Color StripColorPlane(float progressX, float progressY) => new(1, 1, 1, (1 - Easings.InSine(progressY)) * Easings.OutQuint(progressX));
 
-            Color StripColor(float p) => Color.White;
-            float StripWidth(float p) => 16 * progress;
-
             #region Plane positions
             // Prepare Bezier curving
-            int accuracy = 10; // Accuracy of the Bezier curve. The bigger, the more accurate
+            int accuracy = 15; // Accuracy of the Bezier curve. The bigger, the more accurate
             _prevPositionsPlaneSmoothed ??= new Vector2[accuracy, Projectile.WhipSettings.Segments];
             Vector2 startPoint, endPoint, middlePoint;
             float middleIndex;
@@ -151,42 +156,16 @@ namespace Whipcackling.Content.Whips.NuclearWhip
                 }
             }
             #endregion
-            #region Strip positions
-            _prevPositionsSmoothed ??= new Vector2[accuracy];
-            _prevRotationsSmoothed ??= new float[accuracy];
-            for (int i = 0; i < accuracy - 1; i++)
-            {
-                _prevPositionsSmoothed[i] = _prevPositionsPlaneSmoothed[i, width - 1];
-                _prevRotationsSmoothed[i] = (_prevPositionsPlaneSmoothed[i + 1, width - 1] - _prevPositionsPlaneSmoothed[i, width - 1]).ToRotation();
-            }
-            _prevPositionsSmoothed[accuracy - 1] = _prevPositionsPlaneSmoothed[accuracy - 1, width - 1];
-            _prevRotationsSmoothed[accuracy - 1] = _prevRotationsSmoothed[accuracy - 2];
-            #endregion
 
             _plane.PreparePlane(_prevPositionsPlaneSmoothed, StripColorPlane, -Main.screenPosition);
 
             Effect planeEffect = AssetDirectory.Effects.WhipSwingTrail.Value;
             planeEffect.Parameters["uTransformMatrix"].SetValue(Main.GameViewMatrix.NormalizedTransformationmatrix);
             planeEffect.Parameters["uTime"].SetValue(Main.GlobalTimeWrappedHourly);
-            planeEffect.Parameters["uTexturePalette0"].SetValue(AssetDirectory.Textures.Extra.Palettes.AcidFlameTrailPaletteHue.Value);
+            planeEffect.Parameters["uTexturePalette0"].SetValue(AssetDirectory.Textures.Extra.Palettes.LunarTrailPaletteHue.Value);
 
             planeEffect.CurrentTechnique.Passes[0].Apply();
             _plane.DrawMesh();
-
-            _strip.PrepareStrip(_prevPositionsSmoothed, _prevRotationsSmoothed, StripColor, StripWidth, -Main.screenPosition);
-
-            Effect effect = AssetDirectory.Effects.FlameTrail.Value;
-            effect.Parameters["uTime"].SetValue(Main.GlobalTimeWrappedHourly);
-            effect.Parameters["uTransformMatrix"].SetValue(Main.GameViewMatrix.NormalizedTransformationmatrix);
-
-            effect.Parameters["uTextureNoise0"].SetValue(AssetDirectory.Textures.Extra.Noise.GassyNoise.Value);
-            effect.Parameters["uTextureNoise1"].SetValue(AssetDirectory.Textures.Extra.Noise.CellPackedNoise.Value);
-            effect.Parameters["uTextureNoise2"].SetValue(AssetDirectory.Textures.Extra.Noise.CellInvertedNoise.Value);
-            effect.Parameters["uTexturePalette0"].SetValue(AssetDirectory.Textures.Extra.Palettes.MeldFlamePaletteValue.Value);
-            effect.Parameters["uTexturePalette1"].SetValue(AssetDirectory.Textures.Extra.Palettes.AcidFlamePaletteHue.Value);
-
-            effect.CurrentTechnique.Passes[0].Apply();
-            _strip.DrawTrail();
 
             Main.pixelShader.CurrentTechnique.Passes[0].Apply();
         }

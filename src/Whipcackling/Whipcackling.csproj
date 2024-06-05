@@ -6,7 +6,7 @@
     <Import Project="../../catalyst/Mod.Build.targets" />
 
     <PropertyGroup>
-        <LangVersion>10</LangVersion>
+        <LangVersion>12.0</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<OverrideTMLBuildTask>true</OverrideTMLBuildTask>
         <Nullable>enable</Nullable>

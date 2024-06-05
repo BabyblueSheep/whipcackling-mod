@@ -63,6 +63,7 @@ namespace Whipcackling.Assets
                     public static readonly Asset<Texture2D> ToenailFlameTrailPaletteHue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/ToenailFlameTrailPaletteHue");
                     public static readonly Asset<Texture2D> RockTrailPalette = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/RockTrailPalette");
                     public static readonly Asset<Texture2D> ExodiumBeamPalette = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/ExodiumBeamPalette");
+                    public static readonly Asset<Texture2D> LunarTrailPaletteHue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/LunarTrailPaletteHue");
                 }
             }
         }

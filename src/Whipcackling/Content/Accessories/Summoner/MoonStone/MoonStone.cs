@@ -149,11 +149,11 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
                 }
                 else
                 {
-                    Vector2 velocity = projectile.position - projectile.oldPosition; // oldPosition instead of velocity since some minions can stick to players but still move via player movement
+                    Vector2 velocity = projectile.position - projectile.oldPosition; //oldPosition instead of velocity since some minions can stick to players but still move via player movement
                     velocity *= 0.5f;
                     Vector2 correctedVelocity = Vector2.Clamp(new Vector2(Math.Abs(velocity.X), Math.Abs(velocity.Y)), Vector2.Zero, new(10, 10));
-                    float distance = correctedVelocity.X > correctedVelocity.Y ? correctedVelocity.X : correctedVelocity.Y;
-                    LunarAttackCharge += distance * 0.0005f;
+                    float distance = MathHelper.Max(correctedVelocity.X, correctedVelocity.Y);
+                    LunarAttackCharge += distance * 0.00075f;
                     LunarAttackCharge = MathHelper.Min(LunarAttackCharge, 1);
                     if (LunarAttackCharge == 1)
                     {
