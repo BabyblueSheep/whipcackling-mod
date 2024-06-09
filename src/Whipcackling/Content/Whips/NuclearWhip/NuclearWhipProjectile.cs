@@ -88,6 +88,7 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
+            Main.player[Projectile.owner].MinionAttackTargetNPC = target.whoAmI;
             Projectile.damage = (int)(Projectile.damage * (1f - ConstantsNuclear.DamageFalloff));
 
             target.AddBuff(ModContent.BuffType<SulphuricPoisoning>(), 240);

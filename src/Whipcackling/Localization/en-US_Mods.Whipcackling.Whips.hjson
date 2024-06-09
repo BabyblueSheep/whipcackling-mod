@@ -83,4 +83,10 @@ StratusWhip: {
 		DisplayName: Yellow Dwarf Tag
 		Description: like zee toilet lemonade
 	}
+
+	StratusRedStar.DisplayName: Stratus Red Star
+	StratusBlueStar.DisplayName: Stratus Blue Star
+	StratusWhiteStar.DisplayName: Stratus White Star
+	StratusPurpleStar.DisplayName: Stratus Purple Star
+	StratusYellowStar.DisplayName: Stratus Yellow Star
 }

@@ -7,3 +7,8 @@ Enchantments: {
 }
 
 Keybinds.ExpandTooltip.DisplayName: Expand Tooltip
+
+Projectiles: {
+	StratusRedStar.DisplayName: Stratus Red Star
+	StratusYellowStarMini.DisplayName: Stratus Yellow Star Mini
+}

@@ -64,6 +64,11 @@ namespace Whipcackling.Assets
                     public static readonly Asset<Texture2D> RockTrailPalette = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/RockTrailPalette");
                     public static readonly Asset<Texture2D> ExodiumBeamPalette = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/ExodiumBeamPalette");
                     public static readonly Asset<Texture2D> LunarTrailPaletteHue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/LunarTrailPaletteHue");
+                    public static readonly Asset<Texture2D> RedStarHueTrail = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/RedStarHueTrail");
+                    public static readonly Asset<Texture2D> BlueStarHueTrail = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/BlueStarHueTrail");
+                    public static readonly Asset<Texture2D> WhiteStarHueTrail = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/WhiteStarHueTrail");
+                    public static readonly Asset<Texture2D> PurpleStarHueTrail = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/PurpleStarHueTrail");
+                    public static readonly Asset<Texture2D> YellowStarHueTrail = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/YellowStarHueTrail");
                 }
             }
         }
@@ -81,6 +86,7 @@ namespace Whipcackling.Assets
             public static readonly Asset<Effect> Particle = ModContent.Request<Effect>($"{AssetPath}Effects/Particle");
             public static readonly Asset<Effect> Pixelise = ModContent.Request<Effect>($"{AssetPath}Effects/Pixelise");
             public static readonly Asset<Effect> ShockwaveTrail = ModContent.Request<Effect>($"{AssetPath}Effects/ShockwaveTrail");
+            public static readonly Asset<Effect> TriangleTrail = ModContent.Request<Effect>($"{AssetPath}Effects/TriangleTrail");
             public static readonly Asset<Effect> VortexTrail = ModContent.Request<Effect>($"{AssetPath}Effects/VortexTrail");
             public static readonly Asset<Effect> WhipSwingTrail = ModContent.Request<Effect>($"{AssetPath}Effects/WhipSwingTrail");
         }

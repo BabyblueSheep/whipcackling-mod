@@ -22,6 +22,7 @@
       <None Remove="assets\effects\CalamitousOutline.fx" />
       <None Remove="assets\effects\FieryOutline.fx" />
       <None Remove="assets\effects\MoonOutline.fx" />
+      <None Remove="Assets\Effects\TriangleTrail.fx" />
       <None Remove="Assets\Effects\VortexTrail.fx" />
       <None Remove="Assets\Effects\WhipSwingTrail.fx" />
     </ItemGroup>

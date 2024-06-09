@@ -270,7 +270,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                     Projectile k = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), target.Center, Vector2.Zero, ProjectileID.ScytheWhipProj, 100, 0, whip.owner, ai0: npc.whoAmI + 1);
                 }
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.DarkHarvestTooltip")));
-            TagConversions.Add(BuffID.MaceWhipNPCDebuff, new((owner, whip, target, buffTime) => target.AddBuff(ModContent.BuffType<CrushDepth>(), buffTime), Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.MorningStarTooltip")));
+            TagConversions.Add(BuffID.MaceWhipNPCDebuff, new((owner, whip, target, buffTime) => target.AddBuff(ModContent.BuffType<Eutrophication>(), buffTime), Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.MorningStarTooltip")));
             TagConversions.Add(BuffID.RainbowWhipNPCDebuff, new((owner, whip, target, buffTime) =>
             {
                 int counter = 0;

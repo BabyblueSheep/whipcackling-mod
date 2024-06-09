@@ -2,7 +2,6 @@
 {
     public static class ConstantsMeld
     {
-
         //How many hits needed to trigger an explosion.
         public static int BlackHoleHitsByWhip => 6;
 

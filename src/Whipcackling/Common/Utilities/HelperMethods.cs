@@ -119,5 +119,21 @@ namespace Whipcackling.Common.Utilities
             }
             return result;
         }
+
+        /// <summary>
+        /// Rotates a <see cref="Vector2"/> to face another <see cref="Vector2"/>.
+        /// </summary>
+        /// <param name="currentPosition">The position of the vector.</param>
+        /// <param name="currentVelocity">The vector to angle.</param>
+        /// <param name="targetPosition">The target the vector should face.</param>
+        /// <param name="maxChange">The maximum amount of change allowed.</param>
+        /// <returns>The angled vector.</returns>
+        /// <remarks>This is just <see cref="Utils.rotateTowards(Vector2, Vector2, Vector2, float)"/> but with <paramref name="maxChange"/> being actually used why is it unused I don't fucking get it.</remarks>
+        public static Vector2 RotateTowards(Vector2 currentVelocity, Vector2 currentPosition, Vector2 targetPosition, float maxChange)
+        {
+            float num = currentVelocity.Length();
+            float targetAngle = currentPosition.AngleTo(targetPosition);
+            return currentVelocity.ToRotation().AngleTowards(targetAngle, maxChange).ToRotationVector2() * num;
+        }
     }
 }

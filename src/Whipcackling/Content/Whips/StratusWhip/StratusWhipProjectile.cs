@@ -1,19 +1,19 @@
-﻿using CalamityMod.Buffs.DamageOverTime;
-using CalamityMod.Dusts;
+﻿using CalamityMod.Dusts;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using NATUPNPLib;
+using System;
+using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
-using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
-using Whipcackling.Content.Whips.MeldWhip;
-using Whipcackling.Content.Whips.NuclearWhip;
+using Whipcackling.Content.Particles;
+using Whipcackling.Content.Whips.StratusWhip.Stars;
 using Whipcackling.Core;
+using Whipcackling.Core.Particles;
 
 namespace Whipcackling.Content.Whips.StratusWhip
 {
@@ -34,6 +34,8 @@ namespace Whipcackling.Content.Whips.StratusWhip
         private Vector2[,] _prevPositionsPlane;
         private Vector2[,] _prevPositionsPlaneSmoothed;
         private VertexPlane _plane;
+
+        public ref float Hits => ref Projectile.ai[1];
 
         public override void SafeSetDefaults()
         {
@@ -94,8 +96,13 @@ namespace Whipcackling.Content.Whips.StratusWhip
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
         {
+            Main.player[Projectile.owner].MinionAttackTargetNPC = target.whoAmI;
             Projectile.damage = (int)(Projectile.damage * (1f - ConstantsStratus.DamageFalloff));
 
+            Hits++;
+            if (Hits > 1)
+                return;
+            List<int> debuffs = [];
             for (int i = 0; i < TagDebuffList.Length; i++)
             {
                 int debuff = TagDebuffList[i];
@@ -103,9 +110,43 @@ namespace Whipcackling.Content.Whips.StratusWhip
                 {
                     target.AddBuff(debuff, ConstantsStratus.TagDuration);
                 }
+                else
+                {
+                    debuffs.Add(debuff);
+                }
             }
-            int randomDebuff = Main.rand.NextFromList(TagDebuffList);
+
+            if (debuffs.Count <= 0)
+                return;
+
+            int randomDebuff = Main.rand.NextFromCollection(debuffs);
             target.AddBuff(randomDebuff, ConstantsStratus.TagDuration);
+
+            if (randomDebuff == ModContent.BuffType<StratusWhipNPCDebuffRed>())
+            {
+                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<StratusRedStar>(), (int)Math.Ceiling(Projectile.damage * ConstantsStratus.RedStarDamageMult), ConstantsStratus.RedStarKnockback, Projectile.owner,
+                    target.whoAmI + 1, Main.rand.NextFloat(0, MathHelper.TwoPi), 0);
+            }
+            else if (randomDebuff == ModContent.BuffType<StratusWhipNPCDebuffYellow>())
+            {
+                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<StratusYellowStar>(), (int)Math.Ceiling(Projectile.damage * ConstantsStratus.YellowStarDamageMult), ConstantsStratus.YellowStarKnockback, Projectile.owner,
+    target.whoAmI + 1, Main.rand.NextFloat(0, MathHelper.TwoPi), 0);
+            }
+            else if (randomDebuff == ModContent.BuffType<StratusWhipNPCDebuffBlue>())
+            {
+                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<StratusBlueStar>(), (int)Math.Ceiling(Projectile.damage * ConstantsStratus.BlueStarDamageMult), ConstantsStratus.BlueStarKnockback, Projectile.owner,
+    target.whoAmI + 1, Main.rand.NextFloat(0, MathHelper.TwoPi), 0);
+            }
+            else if (randomDebuff == ModContent.BuffType<StratusWhipNPCDebuffPurple>())
+            {
+                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<StratusPurpleStar>(), (int)Math.Ceiling(Projectile.damage * ConstantsStratus.PurpleStarDamageMult), ConstantsStratus.PurpleStarKnockback, Projectile.owner,
+target.whoAmI + 1, Main.rand.NextFloat(0, MathHelper.TwoPi), 0);
+            }
+            else if (randomDebuff == ModContent.BuffType<StratusWhipNPCDebuffWhite>())
+            {
+                Projectile.NewProjectileDirect(Projectile.GetSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<StratusWhiteStar>(), (int)Math.Ceiling(Projectile.damage * ConstantsStratus.WhiteStarDamageMult), ConstantsStratus.WhiteStarKnockback, Projectile.owner,
+target.whoAmI + 1, Main.rand.NextFloat(0, MathHelper.TwoPi), 0);
+            }
         }
 
         public void DrawPixelated()

@@ -51,6 +51,11 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
             {
                 Projectile.velocity += Projectile.DirectionTo(npc.Center) * 0.5f;
                 Projectile.velocity = Projectile.velocity.SafeNormalize(Vector2.Zero) * 3f;
+
+                if (Main.netMode != NetmodeID.SinglePlayer)
+                {
+                    Projectile.netUpdate = true;
+                }
             }
             Projectile.rotation = Projectile.velocity.ToRotation();
         }
