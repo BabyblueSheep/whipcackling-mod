@@ -13,6 +13,7 @@ using Terraria;
 using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
+using Terraria.Audio;
 
 namespace Whipcackling.Content.Whips.StratusWhip.Stars
 {
@@ -65,6 +66,12 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
 
         public override void AI()
         {
+            if (Projectile.soundDelay == 0)
+            {
+                Projectile.soundDelay = 60 + Main.rand.Next(90);
+                SoundEngine.PlaySound(in SoundID.Item9, Projectile.position);
+            }
+
             if (HasTarget)
             {
                 if (!CachedID)
@@ -125,7 +132,11 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
             }
         }
 
-        
+        public override bool PreKill(int timeLeft)
+        {
+            SoundEngine.PlaySound(in SoundID.Item10, Projectile.position);
+            return true;
+        }
 
         public override void OnKill(int timeLeft)
         {

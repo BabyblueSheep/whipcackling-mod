@@ -47,9 +47,9 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
     {
         public bool MoonStone { get; set; }
 
-        public override void PostUpdateBuffs()
+        public override void ResetEffects()
         {
-            MoonStone = false; //I HATE UPDATE ORDERS
+            MoonStone = false;
         }
     }
 
@@ -58,6 +58,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
         public static SoundStyle SpellActivation = new($"{AssetDirectory.AssetPath}Sounds/MoonStone/SpellActivation")
         {
             PitchVariance = 0.5f,
+            Volume = 0.5f,
             MaxInstances = 0,
         };
 
@@ -210,16 +211,11 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
 
         public void ActionAttackClose(Projectile projectile, NPC target)
         {
-            Vector2 velocity = target.Center - projectile.Center;
-            velocity.X *= 0.2f;
-            velocity.Y *= 0.2f;
-
             for (int i = 0; i < 2; i++)
             {
-                Vector2 finalVelocity = velocity;
-                finalVelocity = finalVelocity.RotatedByRandom(0.3f);
-                finalVelocity *= Main.rand.NextFloat(0.9f, 1.1f);
-                Projectile.NewProjectile(projectile.GetProjectileSource_FromThis(), projectile.Center, finalVelocity, ModContent.ProjectileType<ExodiumRock>(), (int)(projectile.damage * 2f), 3, projectile.owner, Main.rand.NextFloat(MathHelper.TwoPi));
+                Vector2 finalVelocity = new Vector2(15, 0).RotatedByRandom(Math.PI * 2);
+                Projectile.NewProjectile(projectile.GetProjectileSource_FromThis(), projectile.Center, finalVelocity, ModContent.ProjectileType<ExodiumRock>(), (int)Math.Ceiling(projectile.damage * 5f), 10f, projectile.owner, 
+                    0, 0, 0);
             }
         }
 
@@ -227,7 +223,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
         {
             for (int i = 0; i < 3; i++)
             {
-                Projectile.NewProjectile(projectile.GetProjectileSource_FromThis(), projectile.Center, new Vector2(3f, 0).RotatedByRandom(MathHelper.TwoPi), ModContent.ProjectileType<ExodiumBeam>(), 10, 0f, projectile.owner);
+                Projectile.NewProjectile(projectile.GetProjectileSource_FromThis(), projectile.Center, new Vector2(3f, 0).RotatedByRandom(MathHelper.TwoPi), ModContent.ProjectileType<ExodiumBeam>(), (int)Math.Ceiling(projectile.damage * 0.5f), 0f, projectile.owner);
             }
         }
 
@@ -281,7 +277,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
                             Projectile projectile = Main.projectile[i];
                             if (!projectile.active)
                                 continue;
-                            if (!projectile.minion)
+                            if (!projectile.GetGlobalProjectile<MoonStoneProjectile>().ValidLunar)
                                 continue;
                             if (!Main.player[projectile.owner].GetModPlayer<MoonStonePlayer>().MoonStone)
                                 continue;

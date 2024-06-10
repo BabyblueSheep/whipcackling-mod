@@ -90,3 +90,12 @@ StratusWhip: {
 	StratusPurpleStar.DisplayName: Stratus Purple Star
 	StratusYellowStar.DisplayName: Stratus Yellow Star
 }
+
+BloodstoneWhip: {
+	BloodstoneWhip: {
+		DisplayName: Bloodstone Whip
+		Tooltip: ""
+	}
+
+	BloodstoneWhipProjectile.DisplayName: Bloodstone Whip Projectile
+}

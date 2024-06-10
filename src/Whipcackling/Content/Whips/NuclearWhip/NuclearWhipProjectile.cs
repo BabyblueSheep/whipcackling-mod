@@ -100,6 +100,15 @@ namespace Whipcackling.Content.Whips.NuclearWhip
             target.AddBuff(ModContent.BuffType<SulphuricPoisoning>(), 240);
         }
 
+        public override int SegmentVariant(int i)
+        {
+            if (i >= ConstantsNuclear.WhipSegments - 5)
+                return 1;
+            else if (i == ConstantsNuclear.WhipSegments - 6)
+                return 2;
+            return 3;
+        }
+
         public void DrawPixelated()
         {
             _plane ??= new VertexPlane();

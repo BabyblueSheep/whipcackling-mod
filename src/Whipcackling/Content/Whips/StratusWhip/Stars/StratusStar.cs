@@ -1,6 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using Terraria;
+using Terraria.Audio;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Whipcackling.Common.Utilities;
 
@@ -45,6 +47,12 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
         public override void AI()
         {
             Timer += 0.05f;
+
+            if (Projectile.soundDelay == 0)
+            {
+                Projectile.soundDelay = 60 + Main.rand.Next(90);
+                SoundEngine.PlaySound(in SoundID.Item9, Projectile.position);
+            }
 
             if (HasTarget)
             {
@@ -95,9 +103,15 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
                     return;
                 NPC npc = Main.npc[target];
 
-                if (npc.active)
+                if (npc.CanBeChasedBy())
                     HostileBehavior(npc);
             }
+        }
+
+        public override bool PreKill(int timeLeft)
+        {
+            SoundEngine.PlaySound(in SoundID.Item10, Projectile.position);
+            return true;
         }
 
         public abstract void OnLosingTarget();

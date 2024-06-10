@@ -15,7 +15,7 @@ MartianDataglove: {
 	Tooltip:
 		'''
 		10% increased whip range and speed
-		All of your summon and sentry slots are converted into +5% summoning damage and +1% critical chance
+		All of your summon and sentry slots are converted into +5% summoning damage and +1% critical chance respectively
 		Whip damage is additionally affected by 15% of melee damage
 		Tag effects are converted into on-hit effects. Press [KEY] to see a full list.
 		'''
@@ -35,11 +35,11 @@ MoonStone: {
 	Tooltip:
 		'''
 		Minions move and act faster, but deal 30% less damage
-		Minions also passively charge a lunar action whilst moving
-		When fully charged, they will do a lunar action if they're attacking an enemy
+		Minions also passively generate lunar charge whilst moving
+		When fully charged, they will heal allies or perform an attack when targetting an enemy
 		'One of the ancient relics'
 		'''
-	ExodiumBeam.DisplayName: Exodium Super Laser Power Beam
+	ExodiumBeam.DisplayName: Exodium Super Laser Power Beam of Power
 	ExodiumHeal.DisplayName: Exodium Healing Aura
 	ExodiumRock.DisplayName: Exodium Rock
 }

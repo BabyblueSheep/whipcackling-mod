@@ -41,15 +41,14 @@ namespace Whipcackling.Content.Accessories.Summoner
     {
         public bool IdolOfVitriol { get; set; }
 
-        public override void PostUpdateBuffs()
+        public override void ResetEffects()
         {
-            IdolOfVitriol = false; //I HATE UPDATE ORDERS
+            IdolOfVitriol = false;
         }
     }
 
     public class IdolOfVitriolProjectile : GlobalProjectile
     {
-
         public override void OnHitNPC(Projectile projectile, NPC target, NPC.HitInfo hit, int damageDone)
         {
             if (!(projectile.minion || ProjectileID.Sets.MinionShot[projectile.type] || projectile.sentry || ProjectileID.Sets.SentryShot[projectile.type]))

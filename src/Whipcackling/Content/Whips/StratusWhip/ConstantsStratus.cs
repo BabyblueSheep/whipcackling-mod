@@ -15,7 +15,7 @@ namespace Whipcackling.Content.Whips.StratusWhip
         public static int ItemDamage => 600;
 
         //The base knockback of the whip.
-        public static float ItemKnockback => 4f;
+        public static float ItemKnockback => 4.5f;
 
         //The base range (shoot speed/velocity) of the whip.
         public static float ItemRange => 6f;

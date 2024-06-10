@@ -41,7 +41,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
         {
             PitchVariance = 0.5f,
             Pitch = 0.2f,
-            Volume = 0.4f,
+            Volume = 1f,
             MaxInstances = 0,
         };
 

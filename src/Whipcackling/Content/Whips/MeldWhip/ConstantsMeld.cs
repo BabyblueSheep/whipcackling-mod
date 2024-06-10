@@ -11,13 +11,13 @@
         public static int ItemDamage => 160;
 
         //The base knockback of the whip.
-        public static float ItemKnockback => 1f;
+        public static float ItemKnockback => 4f;
 
         //The base range (shoot speed/velocity) of the whip.
-        public static float ItemRange => 3f;
+        public static float ItemRange => 4.5f;
 
         //The base use time of the whip.
-        public static int ItemUseTime => 65;
+        public static int ItemUseTime => 50;
 
         //The duration of the super tag cooldown.
         public static int SuperTagCooldown => 60 * 10;
@@ -38,6 +38,6 @@
         public static float WhipRangeMultiplier => 2f;
 
         //The amount of segments on the whip. Practically visual.
-        public static int WhipSegments => 45;
+        public static int WhipSegments => 50;
     }
 }
