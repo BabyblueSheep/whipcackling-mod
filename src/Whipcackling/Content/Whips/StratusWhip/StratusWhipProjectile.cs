@@ -10,7 +10,6 @@ using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
-using Whipcackling.Content.Particles;
 using Whipcackling.Content.Whips.StratusWhip.Stars;
 using Whipcackling.Core;
 using Whipcackling.Core.Particles;

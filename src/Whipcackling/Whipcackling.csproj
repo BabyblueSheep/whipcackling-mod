@@ -18,23 +18,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <None Remove="assets\effects\BasicTrail.fx" />
-      <None Remove="assets\effects\CalamitousOutline.fx" />
-      <None Remove="assets\effects\FieryOutline.fx" />
-      <None Remove="assets\effects\MoonOutline.fx" />
-      <None Remove="Assets\Effects\TriangleTrail.fx" />
-      <None Remove="Assets\Effects\VortexTrail.fx" />
-      <None Remove="Assets\Effects\WhipSwingTrail.fx" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="CalamityMod">
-        <HintPath>lib\CalamityMod.dll</HintPath>
-      </Reference>
+      <None Remove="assets\effects\Particle.fx" />
     </ItemGroup>
 
     <ItemGroup>
       <Folder Include="lib\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Arch">
+        <HintPath>lib\Arch.dll</HintPath>
+      </Reference>
+      <Reference Include="CalamityMod">
+        <HintPath>lib\CalamityMod.dll</HintPath>
+      </Reference>
+      <Reference Include="Schedulers">
+        <HintPath>lib\Schedulers.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

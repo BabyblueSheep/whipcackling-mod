@@ -1,354 +1,158 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Arch.Core;
+using Arch.Core.Extensions;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Content;
+using ReLogic.Peripherals.RGB;
+using ReLogic.Threading;
+using Schedulers;
+using Steamworks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Drawing.Drawing2D;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Terraria;
-using Terraria.Graphics;
-using Terraria.ID;
 using Terraria.ModLoader;
-using Terraria.UI;
+using Whipcackling.Assets;
 using Whipcackling.Common.Utilities;
-using Whipcackling.Core.Particles.Enums;
+using Whipcackling.Core.Particles.Components;
+using static Whipcackling.Assets.AssetDirectory;
 
 namespace Whipcackling.Core.Particles
 {
-    public class ParticleSystem : ModSystem
+    public partial class ParticleSystem : ModSystem
     {
-        const int PARTICLE_LIMIT = 100000;
-
-        public static SpriteViewMatrix UIViewMatrix;
-
         private static DynamicVertexBuffer _vertexBuffer;
         private static DynamicIndexBuffer _indexBuffer;
 
-        private static Dictionary<int, List<Particle>>[] _particles;
+        private static JobScheduler _jobScheduler;
+
+        public static World World { get; set; }
+
+        public static readonly QueryDescription DrawableParticle = new QueryDescription().WithAll<Position, Scale, Rotation, Color, UVCoordinates>();
+
+        public const int MAX_PARTICLES = 1000000;
 
         public override void Load()
         {
-            if (Main.netMode == NetmodeID.Server)
-                return;
+            World = World.Create();
+            _jobScheduler = new(new JobScheduler.Config()
+            {
+                ThreadPrefixName = "Whipcackling",
+                ThreadCount = 0,
+                MaxExpectedConcurrentJobs = 64,
+                StrictAllocationMode = false,
+            });
+            World.SharedJobScheduler = _jobScheduler;
+
             Main.QueueMainThreadAction(() =>
             {
-                UIViewMatrix = new(Main.graphics.GraphicsDevice);
-                _vertexBuffer = new(Main.graphics.GraphicsDevice, typeof(ParticleVertex), 4 * PARTICLE_LIMIT, BufferUsage.WriteOnly);
-                _indexBuffer = new(Main.graphics.GraphicsDevice, typeof(short), 6 * PARTICLE_LIMIT, BufferUsage.WriteOnly);
+                _vertexBuffer = new(Main.graphics.GraphicsDevice, typeof(ParticleVertex), 4 * MAX_PARTICLES, BufferUsage.WriteOnly);
+                _indexBuffer = new(Main.graphics.GraphicsDevice, typeof(int), 6 * MAX_PARTICLES, BufferUsage.WriteOnly);
             });
 
-            _particles = new Dictionary<int, List<Particle>>[5];
-            for (int i = 0; i < _particles.Length; i++)
-                _particles[i] = new();
-
-            On_Dust.UpdateDust += UpdateParticles;
-
-            On_Main.DrawSurfaceBG += DrawParticlesAfterBG;
-            On_Main.DrawBackgroundBlackFill += DrawParticlesAfterWalls;
-            On_Main.DoDraw_Tiles_Solid += DrawParticlesAfterTiles;
-            On_Main.DrawDust += DrawParticlesAfterNPCsProjectiles;
+            On_Main.DrawDust += DrawParticles;
         }
 
         public override void Unload()
         {
-            if (Main.netMode == NetmodeID.Server)
-                return;
-            On_Dust.UpdateDust -= UpdateParticles;
+            World.Destroy(World);
+            _jobScheduler.Dispose();
 
-            On_Main.DrawSurfaceBG -= DrawParticlesAfterBG;
-            On_Main.DrawBackgroundBlackFill -= DrawParticlesAfterWalls;
-            On_Main.DoDraw_Tiles_Solid -= DrawParticlesAfterTiles;
-            On_Main.DrawDust -= DrawParticlesAfterNPCsProjectiles;
-
-            ParticleLoader.Unload();
+            On_Main.DrawDust -= DrawParticles;
         }
 
-        public override void PostSetupContent()
+        public override void PostUpdateDusts()
         {
-            if (Main.netMode == NetmodeID.Server)
-                return;
-            List<ModParticle> particleTypes = ParticleLoader.particles;
-            for (int i = 0; i < ParticleLoader.Count; i++)
-            {
-                _particles[(int)particleTypes[i].DrawLayer].Add(i, new());
-            }
+            World.InlineQuery<UpdateLinearVelocity, Position, LinearVelocity>(UpdateLinearVelocity.Query);
         }
 
-        public override void OnWorldUnload()
-        {
-            ClearParticles();
-        }
-
-        /// <summary>
-        /// Attempts to spawn a single particle into the game world.
-        /// </summary>
-        /// <param name="type">The particle type.</param>
-        /// <param name="position">The position of the particle.</param>
-        /// <param name="velocity">The velocity of the particle. Defaults to <see cref="Vector2.Zero"/>.</param>
-        /// <param name="scale">The position of the particle. Defaults to <see cref="Vector2.One"/>.</param>
-        /// <param name="rotation">The rotation of the particle. Defaults to 0.</param>
-        /// <param name="color">The color of the particle. Defaults to <see cref="Color.White"/>.</param>
-        /// <param name="variant">The frame of the particle. Defaults to 0.</param>
-        /// <param name="lifetime">The total amount of frames the particle will exist for. Defaults to 60.</param>
-        /// <param name="custom1">A custom float for any purpose. Defaults to 0.</param>
-        /// <param name="custom2">A custom float for any purpose. Defaults to 0.</param>
-        /// <param name="custom3">A custom float for any purpose. Defaults to 0.</param>
-        public static void SpawnParticle(int type, Vector2 position, Vector2? velocity = null, Vector2? scale = null, float rotation = 0f, Color? color = null, int variant = 0, int lifetime = 60, float custom1 = 0, float custom2 = 0, float custom3 = 0)
-        {
-            if (Main.netMode == NetmodeID.Server)
-                return;
-            if (Main.gamePaused)
-                return;
-            if (WorldGen.gen)
-                return;
-
-            ModParticle particleType = ParticleLoader.particles[type];
-            Asset<Texture2D> texture = ModContent.Request<Texture2D>(particleType.Texture);
-
-            List<Particle> particles = _particles[(int)particleType.DrawLayer][type];
-
-            Particle particle = new()
-            {
-                Type = type,
-                Velocity = velocity ?? Vector2.Zero,
-                Time = 0,
-                Lifetime = lifetime,
-                Custom = new float[] { custom1, custom2, custom3 },
-                Scale = scale ?? Vector2.One,
-                Rotation = rotation,
-                Position = position - texture.Size() * 0.5f / particleType.Variants,
-                Color = color ?? Color.White,
-                Variant = variant,
-            };
-
-            particleType.OnSpawn(ref particle);
-
-            particles.Add(particle);
-        }
-
-        /// <summary>
-        /// Clears all particles at a specific layer.
-        /// </summary>
-        /// <param name="layer">The draw layer.</param>
-        public static void ClearParticles(int layer)
-        {
-            foreach (KeyValuePair<int, List<Particle>> entry in _particles[layer])
-                entry.Value.Clear();
-        }
-
-        /// <summary>
-        /// Clears all particles.
-        /// </summary>
-        public static void ClearParticles()
-        {
-            for (int layer = 0; layer < _particles.Length; layer++)
-                foreach (KeyValuePair<int, List<Particle>> entry in _particles[layer])
-                    entry.Value.Clear();
-        }
-
-        // Go over every every particle instance to run its Update method, update its position with velocity, increase time and remove it if it expires. 
-        private void UpdateParticles(On_Dust.orig_UpdateDust orig)
-        {
-            orig();
-
-            for (int layer = 0; layer < _particles.Length; layer++)
-            {
-                foreach (KeyValuePair<int, List<Particle>> entry in _particles[layer])
-                {
-                    List<Particle> particles = entry.Value;
-                    ModParticle particleType = ParticleLoader.GetParticle(entry.Key);
-
-                    for (int i = 0; i < particles.Count;  i++)
-                    {
-                        Particle particle = particles[i];
-
-                        particleType.Update(ref particle);
-                        particle.Time++;
-                        if (particle.Progress >= 1)
-                        {
-                            particles.Remove(particles[i]);
-                            i--;
-                            continue;
-                        }
-                        particle.Position += particle.Velocity;
-
-                        particles[i] = particle;
-                    }
-                }
-            }
-        }
-
-        private void DrawParticlesAfterBG(On_Main.orig_DrawSurfaceBG orig, Main self)
-        {
-            UIViewMatrix.Effects = SpriteEffects.None;
-            UIViewMatrix.Zoom = new Vector2(Main.UIScale);
-
-            orig(self);
-
-            Main.spriteBatch.End();
-            Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.Transform);
-            DrawParticles(ParticleDrawLayer.AfterBackgrounds, background: true);
-        }
-
-        private void DrawParticlesAfterWalls(On_Main.orig_DrawBackgroundBlackFill orig, Main self)
+        private void DrawParticles(On_Main.orig_DrawDust orig, Main self)
         {
             orig(self);
-
-            DrawParticles(ParticleDrawLayer.AfterWalls);
-        }
-
-        private void DrawParticlesAfterTiles(On_Main.orig_DoDraw_Tiles_Solid orig, Main self)
-        {
-            orig(self);
-
-            DrawParticles(ParticleDrawLayer.AfterTiles);
-        }
-
-        private void DrawParticlesAfterNPCsProjectiles(On_Main.orig_DrawDust orig, Main self)
-        {
-            orig(self);
-
-            DrawParticles(ParticleDrawLayer.AfterNPCsProjectiles);
-        }
-
-        public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
-        {
-            int hotbarIndex = layers.FindIndex(layer => layer.Name.Equals("Vanilla: Hotbar"));
-            if (hotbarIndex != -1)
-            {
-                layers.Insert(hotbarIndex, new LegacyGameInterfaceLayer(
-                    "Whipcackling: UI Particles",
-                    delegate
-                    {
-                        DrawParticles(ParticleDrawLayer.AfterUI, ui: true);
-                        return true;
-                    },
-                    InterfaceScaleType.None));
-            }
-        }
-
-        // Draw every particle in an individual draw layer.
-        //
-        // background = true -> Not affected by zoom.
-        // ui = true -> In-game UI Scale.
-        // otherwise -> In-game Zoom.
-        //
-        // Instead of using Main.spritebatch.Draw, each particle is a quad and every instance of a specific type is drawn with 1 call.
-        // This is for performance reasons, but also lets me not end and begin the spritebatch for every single particle (type) just for shaders.
-        private void DrawParticles(ParticleDrawLayer layer, bool background = false, bool ui = false)
-        {
-            Matrix matrix = background ? Main.BackgroundViewMatrix.NormalizedTransformationmatrix : (ui ? UIViewMatrix.NormalizedTransformationmatrix : Main.GameViewMatrix.NormalizedTransformationmatrix);
 
             Main.graphics.GraphicsDevice.SetVertexBuffer(_vertexBuffer);
             Main.graphics.GraphicsDevice.Indices = _indexBuffer;
 
-            RasterizerState rasterizerState = new();
-            rasterizerState.CullMode = CullMode.None;
-            Main.graphics.GraphicsDevice.RasterizerState = rasterizerState;
-
-            var particles = _particles[(int)layer];
-            foreach (KeyValuePair<int, List<Particle>> entry in particles)
+            RasterizerState rasterizerState = new()
             {
-                int amount = entry.Value.Count;
-                
-                ModParticle particleType = ParticleLoader.GetParticle(entry.Key);
-                Texture2D texture = ModContent.Request<Texture2D>(particleType.Texture).Value;
-                Effect particle = particleType.Effect;
-                particle.Parameters["uTransformMatrix"].SetValue(matrix);
+                CullMode = CullMode.None
+            };
+            Main.graphics.GraphicsDevice.RasterizerState = rasterizerState;
+            Main.graphics.GraphicsDevice.BlendState = BlendState.AlphaBlend;
 
-                ParticleVertex[] vertices = new ParticleVertex[4 * amount];
-                short[] indices = new short[6 * amount];
+            Effect particle = AssetDirectory.Effects.Particle.Value;
+            particle.Parameters["uTransformMatrix"].SetValue(Main.GameViewMatrix.NormalizedTransformationmatrix);
+            particle.Parameters["uTextureAtlas"].SetValue(ParticleAtlasSystem.Atlas);
+            particle.CurrentTechnique.Passes[0].Apply();
 
-                Main.graphics.GraphicsDevice.BlendState = particleType.BlendMode;
+            Query query = World.Query(in DrawableParticle);
 
-                for (int i = 0; i < amount; i++)
+            int amount = World.CountEntities(in DrawableParticle);
+            ParticleVertex[] vertices = new ParticleVertex[4 * amount];
+            int[] indices = new int[6 * amount];
+
+            int index = 0;
+            foreach (Chunk chunk in query)
+            {
+                chunk.GetSpan<Position, Scale, Rotation, Color, UVCoordinates>(out var positions, out var scales, out var rotations, out var colors, out var uvCoords);
+
+                foreach (int i in chunk)
                 {
-                    Particle instance = entry.Value[i];
-                    Vector2 actualPos = ui ? instance.Position : instance.Position - Main.screenPosition;
+                    Vector2 actualPosition = (Vector2)positions[i] - Main.screenPosition;
+                    Vector2 centerPos = actualPosition + uvCoords[i].Size * 0.5f;
+                    Color color = colors[i];
 
-                    Rectangle frame = particleType.GetFrame(instance);
-                    float frameStartX = frame.X / (float)texture.Width;
-                    float frameStartY = frame.Y / (float)texture.Height;
-                    float frameEndX = (frame.X + frame.Width) / (float)texture.Width;
-                    float frameEndY = (frame.Y + frame.Height) / (float)texture.Height;
-                    Vector2 centerPos = actualPos + frame.Size() * 0.5f;
+                    vertices[index * 4] = new ParticleVertex(
+                        HelperMethods.LerpRectangular(centerPos, actualPosition, (Vector2)scales[i]).RotatedBy((float)rotations[i], centerPos),
+                        color,
+                        uvCoords[i].Position / 512f);
+                    vertices[1 + index * 4] = new ParticleVertex(
+                        HelperMethods.LerpRectangular(centerPos, actualPosition + new Vector2(0, uvCoords[i].Height), (Vector2)scales[i]).RotatedBy((float)rotations[i], centerPos),
+                        color,
+                        (uvCoords[i].Position + new Vector2(0, uvCoords[i].Height)) / 512f);
+                    vertices[2 + index * 4] = new ParticleVertex(
+                        HelperMethods.LerpRectangular(centerPos, actualPosition + new Vector2(uvCoords[i].Width, uvCoords[i].Height), (Vector2)scales[i]).RotatedBy((float)rotations[i], centerPos),
+                        color,
+                        (uvCoords[i].Position + new Vector2(uvCoords[i].Width, uvCoords[i].Height)) / 512f);
+                    vertices[3 + index * 4] = new ParticleVertex(
+                        HelperMethods.LerpRectangular(centerPos, actualPosition + new Vector2(uvCoords[i].Width, 0), (Vector2)scales[i]).RotatedBy((float)rotations[i], centerPos),
+                        color,
+                        (uvCoords[i].Position + new Vector2(uvCoords[i].Width, 0)) / 512f);
 
-                    float angle = instance.Rotation;
-                    int time = instance.Time;
-                    float custom0 = instance.Custom[0]; float custom1 = instance.Custom[1]; float custom2 = instance.Custom[2];
-                    Color lightColor = ui ? Color.White : Lighting.GetColor((int)(instance.Position.X / 16), (int)(instance.Position.Y / 16));
-                    Color color = particleType.GetColor(instance, lightColor);
-
-                    vertices[i * 4] = new ParticleVertex(
-                        HelperMethods.LerpRectangular(centerPos, actualPos, instance.Scale).RotatedBy(angle, centerPos),
-                        color,
-                        new Vector2(frameStartX, frameStartY),
-                        instance.Time,
-                        new Vector3(custom0, custom1, custom2));
-                    vertices[1 + i * 4] = new ParticleVertex(
-                        HelperMethods.LerpRectangular(centerPos, actualPos + new Vector2(0, frame.Height), instance.Scale).RotatedBy(angle, centerPos),
-                        color,
-                        new Vector2(frameStartX, frameEndY),
-                        instance.Time,
-                        new Vector3(custom0, custom1, custom2));
-                    vertices[2 + i * 4] = new ParticleVertex(
-                        HelperMethods.LerpRectangular(centerPos, actualPos + new Vector2(frame.Width, frame.Height), instance.Scale).RotatedBy(angle, centerPos),
-                        color,
-                        new Vector2(frameEndX, frameEndY),
-                        instance.Time,
-                        new Vector3(custom0, custom1, custom2));
-                    vertices[3 + i * 4] = new ParticleVertex(
-                        HelperMethods.LerpRectangular(centerPos, actualPos + new Vector2(frame.Width, 0), instance.Scale).RotatedBy(angle, centerPos),
-                        color,
-                        new Vector2(frameEndX, frameStartY),
-                        instance.Time,
-                        new Vector3(custom0, custom1, custom2));
-
-                    indices[i * 6] = (short)(i * 4); indices[1 + i * 6] = (short)(i * 4 + 1); indices[2 + i * 6] = (short)(i * 4 + 2);
-                    indices[3 + i * 6] = (short)(i * 4); indices[4 + i * 6] = (short)(i * 4 + 2); indices[5 + i * 6] = (short)(i * 4 + 3);
+                    indices[index * 6] = (short)(index * 4); indices[1 + index * 6] = (short)(index * 4 + 1); indices[2 + index * 6] = (short)(index * 4 + 2);
+                    indices[3 + index * 6] = (short)(index * 4); indices[4 + index * 6] = (short)(index * 4 + 2); indices[5 + index * 6] = (short)(index * 4 + 3);
+                    index++;
                 }
-
-                _vertexBuffer.SetData(vertices, SetDataOptions.None);
-                _indexBuffer.SetData(indices);
-
-                particle.Parameters["uTexture"].SetValue(texture);
-
-                particle.CurrentTechnique.Passes[0].Apply();
-                Main.graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4 * amount, 0, 2 * amount);
             }
 
+            _vertexBuffer.SetData(vertices, SetDataOptions.None);
+            _indexBuffer.SetData(indices);
+
+            Main.graphics.GraphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, 4 * amount, 0, 2 * amount);
             Main.pixelShader.CurrentTechnique.Passes[0].Apply();
-            Main.graphics.GraphicsDevice.BlendState = BlendState.AlphaBlend;
         }
 
         private struct ParticleVertex : IVertexType
         {
             public Vector2 Position;
-
             public Color Color;
-
             public Vector2 TextureCoordinate;
 
-            public Single Time;
-
-            public Vector3 Custom;
-
-            private static VertexDeclaration _vertexDeclaration = new VertexDeclaration(
-                new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0),                  // Particle.Position
-                new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0),                       // Particle.Color
-                new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0),        // Texture coordinates
-                new VertexElement(20, VertexElementFormat.Single, VertexElementUsage.Position, 1),                  // Particle.Time
-                new VertexElement(24, VertexElementFormat.Vector3, VertexElementUsage.Position, 2)                  // Particle.Custom
+            private static readonly VertexDeclaration _vertexDeclaration = new VertexDeclaration(
+                new VertexElement(0, VertexElementFormat.Vector2, VertexElementUsage.Position, 0),                  // Position
+                new VertexElement(8, VertexElementFormat.Color, VertexElementUsage.Color, 0),                       // Color
+                new VertexElement(12, VertexElementFormat.Vector2, VertexElementUsage.TextureCoordinate, 0)         // UVInfo
             );
 
-            VertexDeclaration IVertexType.VertexDeclaration => _vertexDeclaration;
+            readonly VertexDeclaration IVertexType.VertexDeclaration => _vertexDeclaration;
 
-            public ParticleVertex(Vector2 position, Color color, Vector2 textureCoordinate, Single time, Vector3 custom)
+            public ParticleVertex(Vector2 position, Color color, Vector2 texturePos)
             {
                 Position = position;
                 Color = color;
-                TextureCoordinate = textureCoordinate;
-                Time = time;
-                Custom = custom;
+                TextureCoordinate = texturePos;
             }
         }
     }

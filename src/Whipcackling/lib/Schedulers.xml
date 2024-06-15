@@ -1,0 +1,585 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Schedulers</name>
+    </assembly>
+    <members>
+        <member name="T:Schedulers.Deque.CircularArray`1">
+            <summary>
+            A <see cref="T:Schedulers.Deque.CircularArray`1"/> as found in Chase and Lev pg. 3 [1]
+            </summary>
+            <remarks>
+                [1] Chase, D., &amp; Lev, Y. (2005). Dynamic circular work-stealing deque. Proceedings of the Seventeenth Annual ACM
+                    Symposium on Parallelism in Algorithms and Architectures. https://doi.org/10.1145/1073970.1073974.
+                    Retrieved October 17, 2023, from https://www.dre.vanderbilt.edu/~schmidt/PDF/work-stealing-dequeue.pdf.
+            </remarks>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Schedulers.Deque.CircularArray`1.#ctor(System.Int32)">
+            <summary>
+            Create a new <see cref="T:Schedulers.Deque.CircularArray`1"/> with log_2(capacity) of at least <paramref name="logSize"/>.
+            </summary>
+            <param name="logSize"></param>
+        </member>
+        <member name="P:Schedulers.Deque.CircularArray`1.Capacity">
+            <summary>
+            Returns the current capacity of the array.
+            </summary>
+        </member>
+        <member name="P:Schedulers.Deque.CircularArray`1.Item(System.Int64)">
+            <summary>
+            Get or set at an index of the array. If the index is greater than the array length, wraps around the array.
+            </summary>
+            <param name="i"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Schedulers.Deque.CircularArray`1.EnsureCapacity(System.Int64,System.Int64)">
+            <summary>
+                Grow the array by 2, copying the old array from a given <paramref name="b"/> and <paramref name="t"/>.
+            </summary>
+            <remarks>
+                The copied elements are guaranteed to map to the same indices from <paramref name="b"/> to
+                <paramref name="t"/>, no matter how large those indices are. Any other indices will not map properly, however.
+            </remarks>
+            <param name="t"></param>
+            <param name="b"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Schedulers.Deque.RangeWorkStealingDeque">
+            <summary>
+                A <see cref="T:Schedulers.Deque.RangeWorkStealingDeque"/> is an implementation of the Chase &amp; Lev Dynamic Circular Work-Stealing Deque [1]
+                specifically for the case of an array of deque of contiguous integers from [0, n). It is implemented specifically for the
+                <see cref="T:Schedulers.IJobParallelFor"/> case. It is a much lighter version than the full implementation of <see cref="T:Schedulers.Deque.WorkStealingDeque`1"/>.
+                It is thread safe, lock-free, and concurrent, but with a caveat: It must have an owner process that exclusively calls
+                <see cref="M:Schedulers.Deque.RangeWorkStealingDeque.TryPopBottom(System.Range@)"/>. Any number of child stealers can call <see cref="M:Schedulers.Deque.RangeWorkStealingDeque.TrySteal(System.Range@)"/> concurrently.
+            </summary>
+            <remarks>
+                See <see cref="T:Schedulers.Deque.WorkStealingDeque`1"/> for the canonical implementation.
+            </remarks>
+        </member>
+        <member name="T:Schedulers.Deque.RangeWorkStealingDeque.Status">
+            <summary>
+            Unlike <see cref="T:Schedulers.Deque.WorkStealingDeque`1"/>, we actually return a status depending on whether it's empty, because
+            we're not using this with a Lin et al. algorithm, rather a much simpler algorithm that does need to know if it's
+            finished or aborted due to contention.
+            </summary>
+        </member>
+        <member name="M:Schedulers.Deque.RangeWorkStealingDeque.#ctor">
+            <summary>
+            Initializes an empty <see cref="T:Schedulers.Deque.RangeWorkStealingDeque"/>.
+            </summary>
+        </member>
+        <member name="P:Schedulers.Deque.RangeWorkStealingDeque.IsEmpty">
+            <summary>
+            Returns whether this <see cref="T:Schedulers.Deque.RangeWorkStealingDeque"/> is "empty," i.e. completed.
+            </summary>
+        </member>
+        <member name="M:Schedulers.Deque.RangeWorkStealingDeque.Set(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Reset the state to the the initial range. Do not call while the work-stealing operation is in progress.
+            </summary>
+            <param name="start"></param>
+            <param name="count"></param>
+            <param name="batchSize"></param>
+        </member>
+        <member name="M:Schedulers.Deque.RangeWorkStealingDeque.TryPopBottom(System.Range@)">
+            <summary>
+            Attempt a pop of some range from the bottom.
+            </summary>
+            <param name="range">The output range, valid only if the return value is equal to <see cref="F:Schedulers.Deque.RangeWorkStealingDeque.Status.Success"/>.</param>
+            <returns><see cref="F:Schedulers.Deque.RangeWorkStealingDeque.Status.Empty"/> if the range is empty and we failed to pop. <see cref="F:Schedulers.Deque.RangeWorkStealingDeque.Status.Success"/> if we succeeded in popping.</returns>
+        </member>
+        <member name="M:Schedulers.Deque.RangeWorkStealingDeque.TrySteal(System.Range@)">
+            <summary>
+            Attempt a steal of some range from the top.
+            </summary>
+            <param name="range">The output range, valid only if the return value is equal to <see cref="F:Schedulers.Deque.RangeWorkStealingDeque.Status.Success"/>.</param>
+            <returns><see cref="F:Schedulers.Deque.RangeWorkStealingDeque.Status.Empty"/> if the range is empty and we failed to steal. <see cref="F:Schedulers.Deque.RangeWorkStealingDeque.Status.Success"/> if we succeeded in stealing.
+            <see cref="F:Schedulers.Deque.RangeWorkStealingDeque.Status.Abort"/> if contention occurred and we should try again.</returns>
+        </member>
+        <member name="T:Schedulers.Deque.WorkStealingDeque`1">
+            <summary>
+                A <see cref="T:Schedulers.Deque.WorkStealingDeque`1"/> is an implementation of the Chase &amp; Lev Dynamic Circular Work-Stealing Deque [1]
+                It is thread safe, lock-free, and concurrent, but with a caveat: It must have an owner process that exclusively calls
+                <see cref="M:Schedulers.Deque.WorkStealingDeque`1.TryPopBottom(`0@)"/> and <see cref="M:Schedulers.Deque.WorkStealingDeque`1.PushBottom(`0)"/>. Any number of child stealers can call
+                <see cref="M:Schedulers.Deque.WorkStealingDeque`1.TrySteal(`0@)"/> concurrently.
+            </summary>
+            <remarks>
+                While Chase &amp; Lev provide several options for memory management, we choose to let resizes discard of the additional
+                memory through GC. This is because we don't expect to frequently grow, or to shrink at all, given our API.
+                [1] Chase, D., &amp; Lev, Y. (2005). Dynamic circular work-stealing deque. Proceedings of the Seventeenth Annual ACM
+                    Symposium on Parallelism in Algorithms and Architectures. ⟨10.1145/1073970.1073974⟩.
+                    Retrieved October 17, 2023, from https://www.dre.vanderbilt.edu/~schmidt/PDF/work-stealing-dequeue.pdf.
+                [2] Nhat Minh Lê, Antoniu Pop, Albert Cohen, Francesco Zappa Nardelli. Correct and Efficient Work-Stealing for Weak Memory
+                    Models. PPoPP '13 - Proceedings of the 18th ACM SIGPLAN symposium on Principles and practice of parallel programming,
+                    Feb 2013, Shenzhen, China. pp.69-80, ⟨10.1145/2442516.2442524⟩. ⟨hal-00802885⟩. Retrieved October 17, 2023 from
+                    https://hal.science/hal-00786679/.
+            </remarks>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="M:Schedulers.Deque.WorkStealingDeque`1.#ctor(System.Int32)">
+            <summary>
+            Create a new <see cref="T:Schedulers.Deque.WorkStealingDeque`1"/> with capacity of at least <paramref name="capacity"/>.
+            </summary>
+            <param name="capacity"></param>
+        </member>
+        <member name="M:Schedulers.Deque.WorkStealingDeque`1.PushBottom(`0)">
+            <summary>
+                Push an item to the bottom of the <see cref="T:Schedulers.Deque.WorkStealingDeque`1"/>.
+            </summary>
+            <remarks>
+                This method must ONLY be called by the deque's owning process, ever!
+                It is not concurrent with itself, only with <see cref="M:Schedulers.Deque.WorkStealingDeque`1.TrySteal(`0@)"/>
+            </remarks>
+            <param name="item">The item to add.</param>
+        </member>
+        <member name="M:Schedulers.Deque.WorkStealingDeque`1.TryPopBottom(`0@)">
+            <summary>
+                Attempt to pop an item from the bottom of the <see cref="T:Schedulers.Deque.WorkStealingDeque`1"/>.
+            </summary>
+            <remarks>
+                This method must ONLY be called by the deque's owning process, ever!
+                It is not concurrent with itself, only with <see cref="M:Schedulers.Deque.WorkStealingDeque`1.TrySteal(`0@)"/>
+            </remarks>
+            <param name="item">Set to the popped item if success. If no success, undefined.</param>
+            <returns>True if we popped successfully and therefore <paramref name="item"/> contains useful data.</returns>
+        </member>
+        <member name="M:Schedulers.Deque.WorkStealingDeque`1.TrySteal(`0@)">
+            <summary>
+                Attempt to steal an item from the top of the <see cref="T:Schedulers.Deque.WorkStealingDeque`1"/>.
+            </summary>
+            <remarks>
+                Unlike <see cref="M:Schedulers.Deque.WorkStealingDeque`1.PushBottom(`0)"/> and <see cref="M:Schedulers.Deque.WorkStealingDeque`1.TryPopBottom(`0@)"/>, this method can be called from any thread
+                at any time, and it is guaranteed to be concurrently compatible with all other methods including itself.
+            </remarks>
+            <param name="item">Set to the stolen item if success. If no success, undefined.</param>
+            <returns>True if we stole successfully and therefore <paramref name="item"/> contains useful data.</returns>
+        </member>
+        <member name="T:Schedulers.IJob">
+            <summary>
+                The <see cref="T:Schedulers.IJob"/> interface.
+                represents a job which can outsource tasks to the <see cref="T:Schedulers.JobScheduler"/>.
+            </summary>
+        </member>
+        <member name="M:Schedulers.IJob.Execute">
+            <summary>
+            Gets called by a thread to execute the job logic.
+            </summary>
+        </member>
+        <member name="T:Schedulers.IJobParallelFor">
+            <summary>
+                Represents a special job that, when scheduled, calls <see cref="M:Schedulers.IJobParallelFor.Execute(System.Int32)"/> with every value of <c>index</c>.
+            </summary>
+            <remarks>
+                While useful, this version shouldn't be overused. For trivial work, a for-loop is going to be better. It isn't always worth the
+                overhead to run a full parallel job. Always profile your code before going more parallel, especially with very small work sizes!
+            </remarks>
+        </member>
+        <member name="P:Schedulers.IJobParallelFor.ThreadCount">
+            <summary>
+                The amount of threads to simultaneously run this job on, or 0 to use <see cref="P:Schedulers.JobScheduler.Config.ThreadCount"/>.
+            </summary>
+            <remarks>
+                <para>
+                    This counts for <see cref="P:Schedulers.JobScheduler.Config.MaxExpectedConcurrentJobs"/>. So, if you schedule a parallel job on a
+                    <see cref="T:Schedulers.JobScheduler"/> with <c><see cref="P:Schedulers.JobScheduler.Config.MaxExpectedConcurrentJobs"/> = 32</c>, and set
+                    <see cref="P:Schedulers.IJobParallelFor.ThreadCount"/> to <c>16</c> for a 16-core processor, just one scheduling of this <see cref="T:Schedulers.IJobParallelFor"/>
+                    will use up half your <see cref="P:Schedulers.JobScheduler.Config.MaxExpectedConcurrentJobs"/>. It is recommended to keep this to a
+                    minimum, if possible: often times, for smaller amounts of values, performance gains with many threads will be negligible.
+                </para>
+                <para>
+                    This does not, however, ensure that <see cref="P:Schedulers.IJobParallelFor.ThreadCount"/> threads will actually be used. If other threads are busy,
+                    the active threads might finish the whole thing before they can get a chance. Additionally, it is capped by
+                    <see cref="P:Schedulers.IJobParallelFor.BatchSize"/>: if there are in total less than <see cref="P:Schedulers.IJobParallelFor.ThreadCount"/> batches given the spawn amount, it
+                    only the needed threads will be spawned.
+                </para>
+            </remarks>
+        </member>
+        <member name="P:Schedulers.IJobParallelFor.BatchSize">
+            <summary>
+                The amount of work to do in each thread.
+            </summary>
+            <remarks>
+                Decreasing <see cref="P:Schedulers.IJobParallelFor.BatchSize"/> will increase overhead, but if your work performed
+                is significantly greater than the overhead, it might make sense to have a <see cref="P:Schedulers.IJobParallelFor.BatchSize"/> of <c>1</c>. On the other hand,
+                if the job runs little code per operation, it would make sense to have a <see cref="P:Schedulers.IJobParallelFor.BatchSize"/> of <c>64</c>. Always profile
+                your code to determine the correct batch size, and err on the side of higher batch size if no performance gain is observed from
+                a smaller size.
+            </remarks>
+        </member>
+        <member name="M:Schedulers.IJobParallelFor.Execute(System.Int32)">
+            <summary>
+                Implement this method to define the execution behavior, just like a normal <see cref="T:Schedulers.IJob"/>.
+                The <see cref="M:Schedulers.IJobParallelFor.Execute(System.Int32)"/> method will be called by threads for every <c>int</c> in <c>[0, n]</c> where <c>n</c>n is the
+                value passed in during <see cref="M:Schedulers.JobScheduler.Schedule(Schedulers.IJobParallelFor,System.Int32,System.Nullable{Schedulers.JobHandle})"/>.
+            </summary>
+            <param name="index"></param>
+        </member>
+        <member name="M:Schedulers.IJobParallelFor.Finish">
+            <summary>
+                Implement this method to provide custom code that executes once all parallel indices have been resolved.
+            </summary>
+        </member>
+        <member name="T:Schedulers.Job">
+            <summary>
+                The <see cref="T:Schedulers.Job"/> struct
+                represents the Job itself with all its most important data. 
+            </summary>
+        </member>
+        <member name="P:Schedulers.Job.InstanceId">
+            <summary>
+                An unchanging ID that goes with the Job instance. Used primarily by <see cref="T:Schedulers.JobHandle"/>
+                for looking up jobs.
+            </summary>
+        </member>
+        <member name="M:Schedulers.Job.#ctor(System.Int32,System.Int32,Schedulers.JobScheduler,System.Int32)">
+            <summary>
+            Create a new <see cref="T:Schedulers.Job"/> with dependent capacity <paramref name="dependentCapacity"/>, ready for scheduling.
+            Automatically adds itself to the <see cref="T:Schedulers.JobScheduler"/>'s pool, meaning you should acquire it only from the pool
+            and never use a <see cref="T:Schedulers.Job"/> straight from construction.
+            </summary>
+            <param name="dependentCapacity"></param>
+            <param name="threadCapacity"></param>
+            <param name="scheduler">The scheduler this <see cref="T:Schedulers.Job"/> was created with.</param>
+        </member>
+        <member name="M:Schedulers.Job.Schedule(Schedulers.IJob,System.Collections.Generic.List{Schedulers.JobHandle},System.Boolean@,Schedulers.IJobParallelFor,System.Nullable{Schedulers.JobHandle},System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Schedule a new instance of this job. It must be fresh out of the pool.
+            </summary>
+            <param name="work"></param>
+            <param name="dependencies"></param>
+            <param name="ready"></param>
+            <param name="parallelWork"></param>
+            <param name="masterJob"></param>
+            <param name="amount"></param>
+            <param name="totalThreads"></param>
+            <param name="thisThread"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Schedulers.Job.Execute(System.Collections.Generic.List{Schedulers.Job})">
+            <summary>
+            Execute the job. Fills <paramref name="readyDependents"/> with any dependents who are newly ready because of us.
+            </summary>
+            <param name="readyDependents"></param>
+        </member>
+        <member name="M:Schedulers.Job.TrySubscribe(System.Int32,System.Threading.ManualResetEvent@)">
+            <summary>
+            Prepare for a subscribe to our <see cref="T:System.Threading.ManualResetEvent"/>.
+            Returns true if the handle is available for subscription (i.e. the job is still incomplete).
+            If this returns true, the caller must call <see cref="M:Schedulers.Job.Unsubscribe(System.Int32)"/>, and may not wait on the handle
+            after <see cref="M:Schedulers.Job.Unsubscribe(System.Int32)"/> is called.
+            </summary>
+            <param name="version"></param>
+            <param name="handle"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Schedulers.Job.Unsubscribe(System.Int32)">
+            <summary>
+                Unsubscribe from a particular wait. Call only after <see cref="M:Schedulers.Job.TrySubscribe(System.Int32,System.Threading.ManualResetEvent@)"/> has returned true, and all
+                the handle-waiting is done.
+            </summary>
+            <param name="version"></param>
+        </member>
+        <member name="T:Schedulers.JobHandle">
+            <summary>
+                The <see cref="T:Schedulers.JobHandle"/> struct
+                is used to control and await a scheduled <see cref="T:Schedulers.IJob"/>.
+            </summary>
+        </member>
+        <member name="F:Schedulers.JobHandle._schedulerCache">
+            <summary>
+                Assigns schedulers an ID, and a cache of tracked jobs.
+                This way, we can store a Scheduler and a Job on a JobHandle by integer ID,
+                so that stackalloc JobHandle[] can work. Otherwise the managed types would prevent it.
+            </summary>
+        </member>
+        <member name="M:Schedulers.JobHandle.InitializeScheduler(System.Int32,Schedulers.JobScheduler,System.Int32)">
+            <summary>
+                Initialize a new Scheduler with the handle-recycling system. Will spontaneously allocate.
+            </summary>
+            <param name="schedulerId">
+                The ID of the scheduler. Must be unique per scheduler instance, and must never
+                be recycled.
+            </param>
+            <param name="scheduler">The scheduler object.</param>
+            <param name="jobsCount">The number of jobs to </param>
+        </member>
+        <member name="M:Schedulers.JobHandle.TrackJob(System.Int32,Schedulers.Job)">
+            <summary>
+                Track a newly-created job with the handle-recycling system. Will spontaneously allocate.
+            </summary>
+            <param name="schedulerId">The ID of the scheduler to track jobs for.</param>
+            <param name="job">The job object to track.</param>
+        </member>
+        <member name="M:Schedulers.JobHandle.DisposeScheduler(System.Int32)">
+            <summary>
+                Remove a scheduler, and all tracked job IDs.
+                This will invalidate all existing handles; any methods on them will be invalid.
+            </summary>
+            <param name="id"></param>
+        </member>
+        <member name="M:Schedulers.JobHandle.#ctor(System.Int32,System.Int32,System.Int64)">
+            <summary>
+                Creates a new <see cref="T:Schedulers.JobHandle"/> instance.
+            </summary>
+            <param name="schedulerId">The <see cref="T:Schedulers.JobScheduler"/> instance ID.</param>
+            <param name="version">The current version of the job.</param>
+            <param name="jobId">The job to assciate with this handle.</param>
+        </member>
+        <member name="P:Schedulers.JobHandle.SchedulerId">
+            <summary>
+                The <see cref="T:Schedulers.JobScheduler"/> used by this scheduled job, as tracked by the ID system.
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobHandle.JobId">
+            <summary>
+                The <see cref="P:Schedulers.JobHandle.Job"/> that was associated with the handle on creation, as tracked by the
+                ID system.
+                May not be the current job, if the version is expired.
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobHandle.Version">
+            <summary>
+                The job version used by this scheduled job. If this doesn't match <see cref="P:Schedulers.JobHandle.Job"/>, it means
+                the job is completed and the original object was recycled.
+            </summary>
+        </member>
+        <member name="M:Schedulers.JobHandle.Complete">
+            <summary>
+                Waits for the <see cref="T:Schedulers.JobHandle"/> to complete.
+            </summary>
+        </member>
+        <member name="M:Schedulers.JobHandle.CompleteAll(System.ReadOnlySpan{Schedulers.JobHandle})">
+            <summary>
+                Waits and blocks the calling thread until all <see cref="T:Schedulers.JobHandle"/>s are completed.
+            </summary>
+            <remarks>
+                This is equivalent to calling <see cref="M:Schedulers.JobHandle.Complete"/> on each <see cref="T:Schedulers.JobHandle"/> individually.
+            </remarks>
+            <param name="handles">The handles to complete.</param>
+        </member>
+        <member name="M:Schedulers.JobHandle.CompleteAll(System.Collections.Generic.IReadOnlyList{Schedulers.JobHandle})">
+            <inheritdoc cref="M:Schedulers.JobHandle.CompleteAll(System.ReadOnlySpan{Schedulers.JobHandle})"/>
+        </member>
+        <member name="M:Schedulers.JobHandle.Equals(System.Object)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Schedulers.JobHandle.Equals(Schedulers.JobHandle)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Schedulers.JobHandle.GetHashCode">
+            <inheritdoc/>
+        </member>
+        <member name="M:Schedulers.JobHandle.op_Equality(Schedulers.JobHandle,Schedulers.JobHandle)">
+            <inheritdoc/>
+        </member>
+        <member name="M:Schedulers.JobHandle.op_Inequality(Schedulers.JobHandle,Schedulers.JobHandle)">
+            <inheritdoc/>
+        </member>
+        <member name="T:Schedulers.JobScheduler">
+            <summary>
+                A <see cref="T:Schedulers.JobScheduler"/> schedules and processes <see cref="T:Schedulers.IJob"/>s asynchronously. Better-suited for larger jobs due to its underlying events. 
+            </summary>
+        </member>
+        <member name="T:Schedulers.JobScheduler.Config">
+            <summary>
+            Contains configuration settings for <see cref="T:Schedulers.JobScheduler"/>.
+            </summary>
+        </member>
+        <member name="M:Schedulers.JobScheduler.Config.#ctor">
+            <summary>
+            Create a new <see cref="T:Schedulers.JobScheduler.Config"/> for a <see cref="T:Schedulers.JobScheduler"/> with all default settings.
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.Config.MaxExpectedConcurrentJobs">
+            <summary>
+            Defines the maximum expected number of concurrent jobs. Increasing this number will allow more jobs to be scheduled
+            without spontaneous allocation, but will increase total memory consumption and decrease performance.
+            If unset, the default is <c>32</c>
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.Config.StrictAllocationMode">
+            <summary>
+            Whether to use Strict Allocation Mode for this <see cref="T:Schedulers.JobScheduler"/>. If an allocation might occur, the JobScheduler
+            will throw a <see cref="T:Schedulers.JobScheduler.MaximumConcurrentJobCountExceededException"/>.
+            Not recommended for production environments (spontaneous allocation is probably usually better than crashing the program).
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.Config.ThreadPrefixName">
+            <summary>
+            The process name to use for spawned child threads. By default, set to the current domain's <see cref="P:System.AppDomain.FriendlyName"/>.
+            Thread will be named "prefix0" for the first thread, "prefix1" for the second thread, etc.
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.Config.ThreadCount">
+            <summary>
+            The amount of worker threads to use. By default, set to <see cref="P:System.Environment.ProcessorCount"/>, the amount of hardware processors 
+            available on the system.
+            </summary>
+        </member>
+        <member name="T:Schedulers.JobScheduler.MaximumConcurrentJobCountExceededException">
+            <summary>
+            Thrown when <see cref="P:Schedulers.JobScheduler.Config.StrictAllocationMode"/> is enabled and the <see cref="T:Schedulers.JobScheduler"/> goes over its <see cref="P:Schedulers.JobScheduler.Config.MaxExpectedConcurrentJobs"/>.
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.ThreadCount">
+            <summary>
+            The actual number of threads this <see cref="T:Schedulers.JobScheduler"/> was spawned with.
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.InstanceId">
+            <summary>
+                A unique ID for this particular Scheduler
+            </summary>
+        </member>
+        <member name="M:Schedulers.JobScheduler.#ctor(Schedulers.JobScheduler.Config@)">
+            <summary>
+            Creates an instance of the <see cref="T:Schedulers.JobScheduler"/>
+            </summary>
+            <param name="settings">The <see cref="T:Schedulers.JobScheduler.Config"/> to use for this instance of <see cref="T:Schedulers.JobScheduler"/></param>
+        </member>
+        <member name="P:Schedulers.JobScheduler.MainThreadID">
+            <summary>
+            Tracks which thread the JobScheduler was constructed on
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.CancellationTokenSource">
+            <summary>
+            Tracks the overall state of all threads; when canceled in Dispose, all child threads are exited
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.QueuedJobs">
+            <summary>
+            Jobs scheduled by the scheduler (NOT other jobs), but not yet flushed to the threads
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.IsMainThread">
+            <summary>
+            Returns true if this is the main thread the scheduler was created on; false otherwise
+            </summary>
+        </member>
+        <member name="M:Schedulers.JobScheduler.Schedule(Schedulers.IJob,System.Nullable{Schedulers.JobHandle},System.ReadOnlySpan{Schedulers.JobHandle},Schedulers.IJobParallelFor,System.Int32)">
+            <summary>
+                Schedules a <see cref="T:Schedulers.IJob"/> and returns its <see cref="T:Schedulers.JobHandle"/>.
+            </summary>
+            <param name="work">The <see cref="T:Schedulers.IJob"/>.</param>
+            <param name="dependency">The <see cref="T:Schedulers.JobHandle"/>-Dependency.</param>
+            <param name="dependencies">A list of additional <see cref="T:Schedulers.JobHandle"/>-Dependencies.</param>
+            <param name="parallelWork">A parallel job, if we want to schedule one.</param>
+            <param name="amount">The amount of times to run the parallel job.</param>
+            <returns>A <see cref="T:Schedulers.JobHandle"/>.</returns>
+            <exception cref="T:System.InvalidOperationException">If called on a different thread than the <see cref="T:Schedulers.JobScheduler"/> was constructed on</exception>
+            <exception cref="T:Schedulers.JobScheduler.MaximumConcurrentJobCountExceededException">If the maximum amount of concurrent jobs is at maximum, and strict mode is enabled.</exception>
+        </member>
+        <member name="M:Schedulers.JobScheduler.Schedule(Schedulers.IJob,System.Nullable{Schedulers.JobHandle})">
+            <summary>
+                Schedules an <see cref="T:Schedulers.IJob"/>. It is only queued up, and will only begin processing when the user calls <see cref="M:Schedulers.JobScheduler.Flush"/> or when any in-progress dependencies complete.
+            </summary>
+            <param name="job">The job to process</param>
+            <param name="dependency">A job that must complete before this job can be run</param>
+            <returns>Its <see cref="T:Schedulers.JobHandle"/>.</returns>
+            <exception cref="T:System.InvalidOperationException">If called on a different thread than the <see cref="T:Schedulers.JobScheduler"/> was constructed on</exception>
+            <exception cref="T:Schedulers.JobScheduler.MaximumConcurrentJobCountExceededException">If the maximum amount of concurrent jobs is at maximum, and strict mode is enabled.</exception>
+        </member>
+        <member name="M:Schedulers.JobScheduler.Schedule(Schedulers.IJobParallelFor,System.Int32,System.Nullable{Schedulers.JobHandle})">
+            <summary>
+                Schedules an <see cref="T:Schedulers.IJobParallelFor"/>. It is only queued up, and will only begin processing when the user calls
+            <see cref="M:Schedulers.JobScheduler.Flush"/> or when any in-progress dependencies complete.
+            </summary>
+            <remarks>
+                Note that this will schedule as many jobs as specified in <see cref="T:Schedulers.IJobParallelFor"/> or the maximum thread count, whichever is less
+                (or the maximum thread count if the threads provided are 0). See <see cref="T:Schedulers.IJobParallelFor"/> for details.
+            </remarks>
+            <param name="job">The <see cref="T:Schedulers.IJobParallelFor"/> to schedule.</param>
+            <param name="amount">
+                The amount of indices to execute.
+                <see cref="M:Schedulers.IJobParallelFor.Execute(System.Int32)"/> will be called for each value in <c>[0, <paramref name="amount"/>)</c>.
+            </param>
+            <param name="dependency">A <see cref="T:Schedulers.JobHandle"/> dependency to require completion of first.</param>
+            <returns>The <see cref="T:Schedulers.JobHandle"/> of a job representing the full task.</returns>
+            <exception cref="T:System.InvalidOperationException">If called on a different thread than the <see cref="T:Schedulers.JobScheduler"/> was constructed on</exception>
+            <exception cref="T:Schedulers.JobScheduler.MaximumConcurrentJobCountExceededException">If the maximum amount of concurrent jobs is at maximum, and strict mode is enabled.</exception>
+        </member>
+        <member name="M:Schedulers.JobScheduler.CombineDependencies(System.ReadOnlySpan{Schedulers.JobHandle})">
+            <summary>
+                Combine multiple dependencies into a single <see cref="T:Schedulers.JobHandle"/> which is scheduled.
+            </summary>
+            <param name="dependencies">A list of handles to depend on. Assumed to not contain duplicates.</param>
+            <returns>The combined <see cref="T:Schedulers.JobHandle"/></returns>
+            <exception cref="T:System.InvalidOperationException">If called on a different thread than the <see cref="T:Schedulers.JobScheduler"/> was constructed on</exception>
+            <exception cref="T:Schedulers.JobScheduler.MaximumConcurrentJobCountExceededException">If the maximum amount of concurrent jobs is at maximum, and strict mode is enabled.</exception>
+        </member>
+        <member name="M:Schedulers.JobScheduler.CheckForSchedulerEquality(Schedulers.JobHandle)">
+            <summary>
+                Checks if the passed <see cref="T:Schedulers.JobHandle"/> equals this <see cref="T:Schedulers.JobScheduler"/>.
+            </summary>
+            <param name="dependency">The <see cref="T:Schedulers.JobHandle"/>.</param>
+            <exception cref="T:System.InvalidOperationException">Is thrown when the passed handle has a different scheduler.</exception>
+        </member>
+        <member name="M:Schedulers.JobScheduler.Flush">
+            <summary>
+            Flushes all queued <see cref="T:Schedulers.IJob"/>'s to the worker threads. 
+            </summary>
+        </member>
+        <member name="M:Schedulers.JobScheduler.Complete(Schedulers.JobHandle@)">
+            <summary>
+            Blocks the thread until the given job ID has been completed. Can be called from Jobs.
+            </summary>
+            <param name="handle"></param>
+        </member>
+        <member name="M:Schedulers.JobScheduler.PoolJob(Schedulers.Job)">
+            <summary>
+            Called exclusively from <see cref="T:Schedulers.Job"/> when it wants to pool itself.
+            </summary>
+            <param name="job"></param>
+        </member>
+        <member name="M:Schedulers.JobScheduler.Dispose">
+            <summary>
+            Disposes all internals and notifies all threads to cancel.
+            </summary>
+        </member>
+        <member name="P:Schedulers.JobScheduler.MasterQueue">
+            <summary>
+            Jobs flushed and waiting to be picked up by worker threads
+            </summary>
+        </member>
+        <member name="M:Schedulers.JobScheduler.ExploitTask(Schedulers.Job@,Schedulers.JobScheduler.WorkerData)">
+            <summary>
+            Resolves this thread's entire deque and cache; returns when empty;
+            </summary>
+            <remarks>
+            Based on Algorithm 3 of Lin et al. [1]
+            </remarks>
+            <param name="task"></param>
+            <param name="workerData"></param>
+        </member>
+        <member name="M:Schedulers.JobScheduler.WaitForTask(Schedulers.Job@,Schedulers.JobScheduler.WorkerData)">
+            <summary>
+            Steals or waits for a task.
+            </summary>
+            <remarks>
+            Based on Algorithm 5 of Lin et al. [1]
+            </remarks>
+            <param name="task"></param>
+            <param name="workerData"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Schedulers.JobScheduler.ExploreTask(Schedulers.Job@,Schedulers.JobScheduler.WorkerData)">
+            <summary>
+            Runs the stealing algorithm, the key insight of Lin et al.
+            It steals some number of times, then begins yielding between steals, and then after a number of failed yields,
+            returns. If at any point it finds a task, it sets <paramref name="task"/> to the found task and returns.
+            </summary>
+            <remarks>
+            Based on Algorithm 4 of Lin et al. [1]
+            </remarks>
+            <param name="task"></param>
+            <param name="workerData"></param>
+        </member>
+        <member name="T:Schedulers.XorshiftRandom">
+            <summary>
+            A super-fast pseudo-random number generator.
+            </summary>
+        </member>
+    </members>
+</doc>

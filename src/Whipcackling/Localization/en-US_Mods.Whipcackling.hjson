@@ -12,3 +12,10 @@ Projectiles: {
 	StratusRedStar.DisplayName: Stratus Red Star
 	StratusYellowStarMini.DisplayName: Stratus Yellow Star Mini
 }
+
+Items: {
+	ParticleSpawner: {
+		DisplayName: Particle Spawner
+		Tooltip: ""
+	}
+}

@@ -1,15 +1,16 @@
-sampler uImage0 : register(s0);
+sampler2D uImage0 : register(s0);
 
 matrix uTransformMatrix;
-texture uTexture;
+
+texture uTextureAtlas;
 sampler2D texture0 = sampler_state
 {
-    texture = <uTexture>;
+    texture = <uTextureAtlas>;
     magfilter = POINT;
     minfilter = POINT;
     mipfilter = POINT;
-    AddressU = wrap;
-    AddressV = wrap;
+    AddressU = clamp;
+    AddressV = clamp;
 };
 
 struct VertexShaderInput
@@ -17,8 +18,6 @@ struct VertexShaderInput
     float2 Coord : TEXCOORD0;
     float4 Position : POSITION0;
     float4 Color : COLOR0;
-    float Time : TEXCOORD1;
-    float3 Custom : TEXCOORD2;
 };
 
 struct VertexShaderOutput

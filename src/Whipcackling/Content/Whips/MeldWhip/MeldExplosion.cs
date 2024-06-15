@@ -10,7 +10,6 @@ using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
-using Whipcackling.Content.Particles;
 using Whipcackling.Core.Particles;
 
 namespace Whipcackling.Content.Whips.MeldWhip
@@ -98,7 +97,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 for (int i = 0; i < 5 + 2 * Strength; i++) // Glow line
                 {
                     float scale = Main.rand.NextFloat(0.35f, 1f);
-                    ParticleSystem.SpawnParticle(
+                    /*ParticleSystem.SpawnParticle(
                     type: ParticleLoader.ParticleType<MeldGlowLine>(),
                     position: Projectile.Center,
                     velocity: Utils.RandomVector2(Main.rand, 3f + 5f * Strength, 4f + 5f * Strength).RotatedByRandom(MathHelper.TwoPi),
@@ -108,14 +107,14 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     variant: 0,
                     lifetime: 10 + Main.rand.Next(5) + 2 * (int)Strength,
                     custom1: Main.rand.NextFloat(0.3f, 0.5f) // Decay
-                    );
+                    );*/
                 }
                 #endregion
 
                 #region Glow Particles
                 for (int i = 0; i < 10 * Strength; i++) // Normal glow dot
                 {
-                    ParticleSystem.SpawnParticle(
+                    /*ParticleSystem.SpawnParticle(
                     type: ParticleLoader.ParticleType<MeldGlowDot>(),
                     position: Projectile.Center,
                     velocity: Utils.RandomVector2(Main.rand, 2f + 1.5f * Strength, 4f + 2.5f * Strength).RotatedByRandom(MathHelper.TwoPi),
@@ -125,12 +124,12 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     variant: 0,
                     lifetime: 20 + Main.rand.Next(10) + 10 * (int)Strength,
                     custom1: Main.rand.NextFloat(0.3f, 0.8f) // Decay
-                    );
+                    );*/
                 }
 
                 for (int i = 0; i < 5 * Strength; i++) // Big glow dot
                 {
-                    ParticleSystem.SpawnParticle(
+                    /*ParticleSystem.SpawnParticle(
                     type: ParticleLoader.ParticleType<MeldGlowDot>(),
                     position: Projectile.Center,
                     velocity: Utils.RandomVector2(Main.rand, 1f + Strength, 3f + 1.5f * Strength).RotatedByRandom(MathHelper.TwoPi),
@@ -140,12 +139,12 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     variant: 0,
                     lifetime: 25 + Main.rand.Next(5, 10) + 10 * (int)Strength,
                     custom1: Main.rand.NextFloat(0.3f, 0.9f) // Decay
-                    );
+                    );*/
                 }
 
                 for (int i = 0; i < 5 * Strength; i++) // Small glow dot
                 {
-                    ParticleSystem.SpawnParticle(
+                    /*ParticleSystem.SpawnParticle(
                     type: ParticleLoader.ParticleType<MeldGlowDot>(),
                     position: Projectile.Center,
                     velocity: Utils.RandomVector2(Main.rand, 3f + 2f * Strength, 4.5f + 3f * Strength).RotatedByRandom(MathHelper.TwoPi),
@@ -155,14 +154,14 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     variant: 0,
                     lifetime: 15 + Main.rand.Next(5) + 10 * (int)Strength,
                     custom1: Main.rand.NextFloat(0.2f, 0.85f) // Decay
-                    );
+                    );*/
                 }
                 #endregion
 
                 #region Smoke Particles
                 for (int i = 0; i < 5 + 10 * Strength; i++) // Standard smoke
                 {
-                    ParticleSystem.SpawnParticle(
+                    /*ParticleSystem.SpawnParticle(
                     type: ParticleLoader.ParticleType<MeldSmoke>(),
                     position: Projectile.Center,
                     velocity: Utils.RandomVector2(Main.rand, Strength, 4f * Strength).RotatedByRandom(MathHelper.TwoPi),
@@ -172,12 +171,12 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     variant: Main.rand.Next(3),
                     lifetime: Main.rand.Next(30, 60) + 10 * (int)Strength,
                     custom1: Main.rand.NextFloat(-0.1f, 0.2f) // Decay
-                    );
+                    );*/
                 }
 
                 for (int i = 0; i < 10 + 5 * Strength; i++) // Slower smoke
                 {
-                    ParticleSystem.SpawnParticle(
+                    /*ParticleSystem.SpawnParticle(
                     type: ParticleLoader.ParticleType<MeldSmoke>(),
                     position: Projectile.Center,
                     velocity: new Vector2(Main.rand.NextFloat(0.5f * Strength, 3f * Strength), Main.rand.NextFloat(0, Strength)).RotatedByRandom(MathHelper.TwoPi),
@@ -187,7 +186,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     variant: Main.rand.Next(3),
                     lifetime: Main.rand.Next(40, 60) + 5 * (int)Strength,
                     custom1: Main.rand.NextFloat(0f, 0.3f) // Decay
-                    );
+                    );*/
                 }
 
 
@@ -220,7 +219,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     Vector2 randomPos = new(Main.rand.NextFloat(Projectile.Center.X - Size, Projectile.Center.X + Size), Main.rand.NextFloat(Projectile.Center.Y - Size, Projectile.Center.Y + Size));
                     if (!tile.HasTile)
                     {
-                        ParticleSystem.SpawnParticle(
+                        /*ParticleSystem.SpawnParticle(
                             type: ParticleLoader.ParticleType<BlackHoleStar>(),
                             position: randomPos,
                             scale: new(Main.rand.NextFloat(1.5f, 3f)),
@@ -229,7 +228,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                             custom1: Projectile.Center.X, // Origin X
                             custom2: Projectile.Center.Y, // Origin Y
                             custom3: Main.rand.NextFloat(-0.1f, 0.1f) // Angle rotation
-                            );
+                            );*/
                     }
                     else
                     {

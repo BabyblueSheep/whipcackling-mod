@@ -14,7 +14,6 @@ using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
-using Whipcackling.Content.Particles;
 using Whipcackling.Core.Particles;
 
 namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
@@ -223,7 +222,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                         Vector2 positionMod = new(Main.rand.NextFloat(-3f, 3f), Main.rand.NextFloat(-3f, 3f));
                         Vector2 scaleMod = new(Main.rand.NextFloat(-0.2f, 0.1f), Main.rand.NextFloat(-0.1f, 0.2f));
 
-                        ParticleSystem.SpawnParticle(
+                        /*ParticleSystem.SpawnParticle(
                             type: ParticleLoader.ParticleType<HolyConnectedBeam>(),
                             position: position + positionMod * distance * 0.0025f,
                             velocity: Vector2.Zero,
@@ -235,7 +234,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                             custom1: Main.rand.NextFloat(0.25f, 0.55f), // Decay
                             custom2: target.whoAmI, // First NPC anchor
                             custom3: npc.whoAmI // Second NPC anchor
-                        );
+                        );*/
                     }
                 }
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.DurendalTooltip")));

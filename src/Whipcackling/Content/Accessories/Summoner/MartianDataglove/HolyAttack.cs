@@ -8,7 +8,6 @@ using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
-using Whipcackling.Content.Particles;
 using Whipcackling.Core.Particles;
 
 namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
@@ -50,7 +49,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
         {
             if (!Initialized)
             {
-                for (int i = 0; i < 4 + Main.rand.Next(3); i++)
+                /*for (int i = 0; i < 4 + Main.rand.Next(3); i++)
                 {
                     float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
                     ParticleSystem.SpawnParticle(
@@ -65,7 +64,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                         custom1: Main.rand.NextFloat(0.3f, 0.5f), // Decay
                         custom2: NPCID // NPC anchor
                     );
-                }
+                }*/
 
                 Initialized = true;
             }

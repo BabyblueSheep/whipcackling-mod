@@ -16,7 +16,6 @@ using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
-using Whipcackling.Content.Particles;
 using Whipcackling.Core.Particles;
 
 namespace Whipcackling.Content.Accessories.Summoner.MoonStone
@@ -146,7 +145,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
             Gore.NewGore(Projectile.Center, Vector2.Zero, ModContent.GoreType<ExodiumRockGore2>());
             Gore.NewGore(Projectile.Center, Vector2.Zero, ModContent.GoreType<ExodiumRockGore3>());
 
-            for (int i = 0; i < 3; i++)
+            /*for (int i = 0; i < 3; i++)
                 ParticleSystem.SpawnParticle(
                     type: ParticleLoader.ParticleType<ExodiumGlowDot>(),
                     position: Projectile.Center,
@@ -156,7 +155,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
                     color: new Color(i / 2f, 1f, 0.3f + i / 2f),
                     lifetime: Main.rand.Next(20, 30),
                     custom1: Main.rand.NextFloat(0.5f) // Decay
-                    );
+                    );*/
         }
 
         public override bool PreDraw(ref Color lightColor)
