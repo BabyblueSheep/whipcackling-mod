@@ -58,10 +58,5 @@ namespace Whipcackling.Core.Particles
             Atlas = null;
             AtlasDefinitions.Clear();
         }
-
-        public override void PostDrawInterface(SpriteBatch spriteBatch)
-        {
-            Main.spriteBatch.Draw(Atlas, new Vector2(200), Color.White);
-        }
     }
 }

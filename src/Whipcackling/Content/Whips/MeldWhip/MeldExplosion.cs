@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Arch.Core;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Utilities;
 using System;
@@ -6,11 +7,13 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Graphics;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
 using Whipcackling.Core.Particles;
+using Whipcackling.Core.Particles.Components;
 
 namespace Whipcackling.Content.Whips.MeldWhip
 {
@@ -97,96 +100,108 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 for (int i = 0; i < 5 + 2 * Strength; i++) // Glow line
                 {
                     float scale = Main.rand.NextFloat(0.35f, 1f);
-                    /*ParticleSystem.SpawnParticle(
-                    type: ParticleLoader.ParticleType<MeldGlowLine>(),
-                    position: Projectile.Center,
-                    velocity: Utils.RandomVector2(Main.rand, 3f + 5f * Strength, 4f + 5f * Strength).RotatedByRandom(MathHelper.TwoPi),
-                    scale: new(scale, scale * 1.5f + 2f),
-                    rotation: 0,
-                    color: Color.White,
-                    variant: 0,
-                    lifetime: 10 + Main.rand.Next(5) + 2 * (int)Strength,
-                    custom1: Main.rand.NextFloat(0.3f, 0.5f) // Decay
-                    );*/
+                    ParticleSystem.World.Create(
+                        (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["GlowLine"],
+                        (Position)Projectile.Center,
+                        new Scale(scale, scale * 1.5f + 2f),
+                        new Rotation(0),
+                        new Color(255, 255, 255, 0),
+                        new TimeLeft(10 + Main.rand.Next(5) + 2 * (int)Strength),
+                        new TimeUntilAction(8 + Main.rand.Next(2) + (int)Strength),
+                        new LinearVelocityAcceleration(Utils.RandomVector2(Main.rand, 3f + 5f * Strength, 4f + 5f * Strength).RotatedByRandom(MathHelper.TwoPi), 0, 0, 0.95f, 0.95f),
+                        new RotationIsVelocity(),
+                        new LinearScaleIncrease(-0.1f, -0.5f),
+                        new LinearColorFade(5)
+                        );
                 }
                 #endregion
 
                 #region Glow Particles
                 for (int i = 0; i < 10 * Strength; i++) // Normal glow dot
                 {
-                    /*ParticleSystem.SpawnParticle(
-                    type: ParticleLoader.ParticleType<MeldGlowDot>(),
-                    position: Projectile.Center,
-                    velocity: Utils.RandomVector2(Main.rand, 2f + 1.5f * Strength, 4f + 2.5f * Strength).RotatedByRandom(MathHelper.TwoPi),
-                    scale: new(Main.rand.NextFloat(0.8f, 1f) + 0.15f * Strength),
-                    rotation: 0,
-                    color: Main.rand.NextFromList(Color.PaleGreen, Color.SkyBlue, Color.Aquamarine),
-                    variant: 0,
-                    lifetime: 20 + Main.rand.Next(10) + 10 * (int)Strength,
-                    custom1: Main.rand.NextFloat(0.3f, 0.8f) // Decay
-                    );*/
+                    ParticleSystem.World.Create(
+                        (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["GlowDot"],
+                        (Position)Projectile.Center,
+                        (Scale)(new Vector2(Main.rand.NextFloat(0.8f, 1f) + 0.15f * Strength)),
+                        new Rotation(0),
+                        Main.rand.NextFromList(Color.PaleGreen, Color.SkyBlue, Color.Aquamarine).MultiplyRGBA(new Color(255, 255, 255, 0)),
+                        new TimeLeft(20 + Main.rand.Next(10) + 10 * (int)Strength),
+                        new TimeUntilAction(8 + Main.rand.Next(5) + 7 * (int)Strength),
+                        new LinearVelocityAcceleration(Utils.RandomVector2(Main.rand, 2f + 1.5f * Strength, 4f + 2.5f * Strength).RotatedByRandom(MathHelper.TwoPi), 0, 0, 0.95f, 0.95f),
+                        new RotationIsVelocity(),
+                        new LinearScaleIncrease(-0.05f, -0.05f),
+                        new LinearColorFade(5)
+                        );
                 }
 
                 for (int i = 0; i < 5 * Strength; i++) // Big glow dot
                 {
-                    /*ParticleSystem.SpawnParticle(
-                    type: ParticleLoader.ParticleType<MeldGlowDot>(),
-                    position: Projectile.Center,
-                    velocity: Utils.RandomVector2(Main.rand, 1f + Strength, 3f + 1.5f * Strength).RotatedByRandom(MathHelper.TwoPi),
-                    scale: new(Main.rand.NextFloat(0.85f, 1.1f) * 1.35f + 0.2f * Strength),
-                    rotation: 0,
-                    color: Main.rand.NextFromList(Color.PaleGreen, Color.SkyBlue, Color.Aquamarine),
-                    variant: 0,
-                    lifetime: 25 + Main.rand.Next(5, 10) + 10 * (int)Strength,
-                    custom1: Main.rand.NextFloat(0.3f, 0.9f) // Decay
-                    );*/
+                    ParticleSystem.World.Create(
+                        (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["GlowDot"],
+                        (Position)Projectile.Center,
+                        (Scale)(new Vector2(Main.rand.NextFloat(0.85f, 1.1f) * 1.35f + 0.2f * Strength)),
+                        new Rotation(0),
+                        Main.rand.NextFromList(Color.PaleGreen, Color.SkyBlue, Color.Aquamarine).MultiplyRGBA(new Color(255, 255, 255, 0)),
+                        new TimeLeft(25 + Main.rand.Next(5, 10) + 10 * (int)Strength),
+                        new TimeUntilAction(12 + Main.rand.Next(5) + 7 * (int)Strength),
+                        new LinearVelocityAcceleration(Utils.RandomVector2(Main.rand, 1f + Strength, 3f + 1.5f * Strength).RotatedByRandom(MathHelper.TwoPi), 0, 0, 0.95f, 0.95f),
+                        new RotationIsVelocity(),
+                        new LinearScaleIncrease(-0.05f, -0.05f),
+                        new LinearColorFade(5)
+                        );
                 }
 
                 for (int i = 0; i < 5 * Strength; i++) // Small glow dot
                 {
-                    /*ParticleSystem.SpawnParticle(
-                    type: ParticleLoader.ParticleType<MeldGlowDot>(),
-                    position: Projectile.Center,
-                    velocity: Utils.RandomVector2(Main.rand, 3f + 2f * Strength, 4.5f + 3f * Strength).RotatedByRandom(MathHelper.TwoPi),
-                    scale: new(Main.rand.NextFloat(0.65f, 0.9f) + 0.1f * Strength),
-                    rotation: 0,
-                    color: Main.rand.NextFromList(Color.PaleGreen, Color.SkyBlue, Color.Aquamarine),
-                    variant: 0,
-                    lifetime: 15 + Main.rand.Next(5) + 10 * (int)Strength,
-                    custom1: Main.rand.NextFloat(0.2f, 0.85f) // Decay
-                    );*/
+                    ParticleSystem.World.Create(
+                        (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["GlowDot"],
+                        (Position)Projectile.Center,
+                        (Scale)(new Vector2(Main.rand.NextFloat(0.65f, 0.9f) + 0.1f * Strength)),
+                        new Rotation(0),
+                        Main.rand.NextFromList(Color.PaleGreen, Color.SkyBlue, Color.Aquamarine).MultiplyRGBA(new Color(255, 255, 255, 0)),
+                        new TimeLeft(15 + Main.rand.Next(5) + 10 * (int)Strength),
+                        new TimeUntilAction(7 + Main.rand.Next(5) + 7 * (int)Strength),
+                        new LinearVelocityAcceleration(Utils.RandomVector2(Main.rand, 3f + 2f * Strength, 4.5f + 3f * Strength).RotatedByRandom(MathHelper.TwoPi), 0, 0, 0.95f, 0.95f),
+                        new RotationIsVelocity(),
+                        new LinearScaleIncrease(-0.05f, -0.05f),
+                        new LinearColorFade(5)
+                        );
                 }
                 #endregion
 
                 #region Smoke Particles
                 for (int i = 0; i < 5 + 10 * Strength; i++) // Standard smoke
                 {
-                    /*ParticleSystem.SpawnParticle(
-                    type: ParticleLoader.ParticleType<MeldSmoke>(),
-                    position: Projectile.Center,
-                    velocity: Utils.RandomVector2(Main.rand, Strength, 4f * Strength).RotatedByRandom(MathHelper.TwoPi),
-                    scale: new(Main.rand.NextFloat(0.75f, 1f) + 0.3f * Strength),
-                    rotation: Main.rand.NextFloat(MathHelper.TwoPi),
-                    color: new(Color.SpringGreen.R, Color.SpringGreen.G, Color.SpringGreen.B, 240),
-                    variant: Main.rand.Next(3),
-                    lifetime: Main.rand.Next(30, 60) + 10 * (int)Strength,
-                    custom1: Main.rand.NextFloat(-0.1f, 0.2f) // Decay
-                    );*/
+                    ParticleSystem.World.Create(
+                        (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions[$"Smoke{Main.rand.Next(1, 4)}"],
+                        (Position)Projectile.Center,
+                        (Scale)(new Vector2(Main.rand.NextFloat(0.75f, 1f) + 0.3f * Strength)),
+                        new Rotation(Main.rand.NextFloat(MathHelper.TwoPi)),
+                        Color.SpringGreen,
+                        new TimeLeft(Main.rand.Next(30, 60) + 10 * (int)Strength),
+                        new TimeUntilAction(Main.rand.Next(30, 40) + 10 * (int)Strength),
+                        new LinearVelocityAcceleration(Utils.RandomVector2(Main.rand, Strength, 4f * Strength).RotatedByRandom(MathHelper.TwoPi), 0, -0.05f, 0.95f, 0.95f),
+                        new RotateWithLinearVelocity(0.01f, 0),
+                        new LinearScaleIncrease(0.02f, 0.02f),
+                        new ShiftColorThree(Color.SpringGreen, new Color(30, 45, 72, 200), new Color(0, 0, 0, 0))
+                        );
                 }
 
                 for (int i = 0; i < 10 + 5 * Strength; i++) // Slower smoke
                 {
-                    /*ParticleSystem.SpawnParticle(
-                    type: ParticleLoader.ParticleType<MeldSmoke>(),
-                    position: Projectile.Center,
-                    velocity: new Vector2(Main.rand.NextFloat(0.5f * Strength, 3f * Strength), Main.rand.NextFloat(0, Strength)).RotatedByRandom(MathHelper.TwoPi),
-                    scale: new(Main.rand.NextFloat(0.5f, 1.2f) + 0.3f * Strength),
-                    rotation: Main.rand.NextFloat(MathHelper.TwoPi),
-                    color: new(Color.SpringGreen.R, Color.SpringGreen.G, Color.SpringGreen.B, 200),
-                    variant: Main.rand.Next(3),
-                    lifetime: Main.rand.Next(40, 60) + 5 * (int)Strength,
-                    custom1: Main.rand.NextFloat(0f, 0.3f) // Decay
-                    );*/
+                    ParticleSystem.World.Create(
+                        (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions[$"Smoke{Main.rand.Next(1, 4)}"],
+                        (Position)Projectile.Center,
+                        (Scale)(new Vector2(Main.rand.NextFloat(0.5f, 1.2f) + 0.3f * Strength)),
+                        new Rotation(Main.rand.NextFloat(MathHelper.TwoPi)),
+                        Color.SpringGreen,
+                        new TimeLeft(Main.rand.Next(40, 60) + 5 * (int)Strength),
+                        new TimeUntilAction(Main.rand.Next(30, 45) + 5 * (int)Strength),
+                        new LinearVelocityAcceleration(new Vector2(Main.rand.NextFloat(0.5f * Strength, 3f * Strength), Main.rand.NextFloat(0, Strength)).RotatedByRandom(MathHelper.TwoPi), 0, -0.05f, 0.95f, 0.95f),
+                        new RotateWithLinearVelocity(0.01f, 0),
+                        new LinearScaleIncrease(0.02f, 0.02f),
+                        new ShiftColorThree(Color.SpringGreen, new Color(30, 45, 72, 200), new Color(0, 0,0, 0))
+                        );
                 }
 
 
@@ -219,16 +234,19 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     Vector2 randomPos = new(Main.rand.NextFloat(Projectile.Center.X - Size, Projectile.Center.X + Size), Main.rand.NextFloat(Projectile.Center.Y - Size, Projectile.Center.Y + Size));
                     if (!tile.HasTile)
                     {
-                        /*ParticleSystem.SpawnParticle(
-                            type: ParticleLoader.ParticleType<BlackHoleStar>(),
-                            position: randomPos,
-                            scale: new(Main.rand.NextFloat(1.5f, 3f)),
-                            rotation: Main.rand.NextFloat(MathHelper.TwoPi),
-                            lifetime: Main.rand.Next(20, 35),
-                            custom1: Projectile.Center.X, // Origin X
-                            custom2: Projectile.Center.Y, // Origin Y
-                            custom3: Main.rand.NextFloat(-0.1f, 0.1f) // Angle rotation
-                            );*/
+                        float angle = Main.rand.NextFloat(-0.1f, 0.1f);
+                        ParticleSystem.World.Create(
+                            (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["StarBig"],
+                            (Position)randomPos,
+                            (Scale)(new Vector2(Main.rand.NextFloat(1.5f, 3f))),
+                            new Rotation(Main.rand.NextFloat(MathHelper.TwoPi)),
+                            new Color(0, 0, 0, 0),
+                            new TimeLeft(Main.rand.Next(20, 35)),
+                            new AngularVelocityMoveToTarget(angle, Projectile.Center.X, Projectile.Center.Y, 0.05f),
+                            new LinearRotationChange(angle),
+                            new ExponentialScaleIncrease(0.95f, 0.95f),
+                            new AlphaFadeInOut(5, 5)
+                            );
                     }
                     else
                     {
@@ -272,7 +290,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
 
         public override void DrawBehind(int index, List<int> behindNPCsAndTiles, List<int> behindNPCs, List<int> behindProjectiles, List<int> overPlayers, List<int> overWiresUI)
         {
-            behindNPCs.Add(index);
+            behindNPCsAndTiles.Add(index);
         }
 
         public override bool PreDraw(ref Color lightColor)

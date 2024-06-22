@@ -84,6 +84,7 @@ namespace Whipcackling.Assets
             public static readonly Asset<Effect> MoonOutline = ModContent.Request<Effect>($"{AssetPath}Effects/MoonOutline");
             public static readonly Asset<Effect> NegazoneEffect = ModContent.Request<Effect>($"{AssetPath}Effects/NegazoneEffect");
             public static readonly Asset<Effect> Particle = ModContent.Request<Effect>($"{AssetPath}Effects/Particle");
+            public static readonly Asset<Effect> ParticleOld = ModContent.Request<Effect>($"{AssetPath}Effects/ParticleOld");
             public static readonly Asset<Effect> Pixelise = ModContent.Request<Effect>($"{AssetPath}Effects/Pixelise");
             public static readonly Asset<Effect> ShockwaveTrail = ModContent.Request<Effect>($"{AssetPath}Effects/ShockwaveTrail");
             public static readonly Asset<Effect> TriangleTrail = ModContent.Request<Effect>($"{AssetPath}Effects/TriangleTrail");

@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using CalamityMod.Particles;
+using Microsoft.Win32;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -9,6 +10,7 @@ using Terraria.GameContent;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Core.Particles;
+using Whipcackling.Core.Particles.Components;
 
 namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
 {
@@ -49,22 +51,22 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
         {
             if (!Initialized)
             {
-                /*for (int i = 0; i < 4 + Main.rand.Next(3); i++)
+                for (int i = 0; i < 4 + Main.rand.Next(3); i++)
                 {
                     float rotation = Main.rand.NextFloat(MathHelper.TwoPi);
-                    ParticleSystem.SpawnParticle(
-                        type: ParticleLoader.ParticleType<HolyGlowLine>(),
-                        position: Projectile.position + (rotation - MathHelper.PiOver2).ToRotationVector2() * 50,
-                        velocity: Vector2.Zero,
-                        scale: new Vector2(1f, 3f),
-                        rotation: rotation,
-                        color: Color.Khaki,
-                        variant: 0,
-                        lifetime: 10 + Main.rand.Next(5) + 2,
-                        custom1: Main.rand.NextFloat(0.3f, 0.5f), // Decay
-                        custom2: NPCID // NPC anchor
-                    );
-                }*/
+                    ParticleSystem.World.Create(
+                        (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["GlowLine"],
+                        (Position)(Projectile.position + (rotation - MathHelper.PiOver2).ToRotationVector2() * 50),
+                        new Scale(1, 3),
+                        new Rotation(rotation),
+                        Color.Khaki.MultiplyRGBA(new Color(1f, 1f, 1f, 0f)),
+                        new TimeLeft(12 + Main.rand.Next(5)),
+                        new LinearVelocityExponentialAccelerationTimed((rotation - MathHelper.PiOver2).ToRotationVector2() * -5f),
+                        new LinearScaleIncrease(-0.05f, -0.2f),
+                        new ExponentialColorFade(0.7f),
+                        new TimeUntilAction(4 + Main.rand.Next(4))
+                        );
+                }
 
                 Initialized = true;
             }

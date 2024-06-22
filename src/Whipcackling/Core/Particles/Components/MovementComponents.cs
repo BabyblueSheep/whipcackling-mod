@@ -1,35 +1,99 @@
-﻿using Arch.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.ModLoader;
+﻿using Microsoft.Xna.Framework;
 
 namespace Whipcackling.Core.Particles.Components
 {
-    public struct LinearVelocity
+    public struct Position(float x, float y)
+    {
+        public float X = x; public float Y = y;
+
+        public static explicit operator Vector2(Position position)
+        {
+            return new Vector2(position.X, position.Y);
+        }
+
+        public static explicit operator Position(Vector2 vector)
+        {
+            return new Position(vector.X, vector.Y);
+        }
+    }
+
+    public struct LinearVelocityAcceleration
     {
         public float VelocityX;
         public float VelocityY;
 
-        public float AccelerationX;
-        public float AccelerationY;
+        public float LinearAccelerationX;
+        public float LinearAccelerationY;
+        public float ExponentialAccelerationX;
+        public float ExponentialAccelerationY;
+
+        public LinearVelocityAcceleration(float velocityX, float velocityY, float accelerationX = 0, float accelerationY = 0, float expAccelerationX = 1, float expAccelerationY = 1)
+        {
+            VelocityX = velocityX;
+            VelocityY = velocityY;
+
+            LinearAccelerationX = accelerationX;
+            LinearAccelerationY = accelerationY;
+
+            ExponentialAccelerationX = expAccelerationX;
+            ExponentialAccelerationY = expAccelerationY;
+        }
+
+        public LinearVelocityAcceleration(Vector2 velocity, float accelerationX = 0, float accelerationY = 0, float expAccelerationX = 1, float expAccelerationY = 1)
+        {
+            VelocityX = velocity.X; 
+            VelocityY = velocity.Y;
+
+            LinearAccelerationX = accelerationX;
+            LinearAccelerationY = accelerationY;
+
+            ExponentialAccelerationX = expAccelerationX;
+            ExponentialAccelerationY = expAccelerationY;
+        }
     }
 
-    public struct UpdateLinearVelocity : IForEach<Position, LinearVelocity>
+    public struct LinearVelocityExponentialAccelerationTimed
     {
-        public static QueryDescription Query => new QueryDescription().WithAll<Position, LinearVelocity>();
+        public float VelocityX;
+        public float VelocityY;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public readonly void Update(ref Position position, ref LinearVelocity velocity)
+        public float LinearAccelerationX;
+        public float LinearAccelerationY;
+        public float ExponentialAccelerationX;
+        public float ExponentialAccelerationY;
+
+        public LinearVelocityExponentialAccelerationTimed(float velocityX, float velocityY, float accelerationX = 0, float accelerationY = 0, float expAccelerationX = 1, float expAccelerationY = 1)
         {
-            position.X += velocity.VelocityX;
-            position.Y += velocity.VelocityY;
+            VelocityX = velocityX;
+            VelocityY = velocityY;
 
-            velocity.VelocityX += velocity.AccelerationX;
-            velocity.VelocityY += velocity.AccelerationY;
+            LinearAccelerationX = accelerationX;
+            LinearAccelerationY = accelerationY;
+
+            ExponentialAccelerationX = expAccelerationX;
+            ExponentialAccelerationY = expAccelerationY;
         }
+
+        public LinearVelocityExponentialAccelerationTimed(Vector2 velocity, float accelerationX = 0, float accelerationY = 0, float expAccelerationX = 1, float expAccelerationY = 1)
+        {
+            VelocityX = velocity.X;
+            VelocityY = velocity.Y;
+
+            LinearAccelerationX = accelerationX;
+            LinearAccelerationY = accelerationY;
+
+            ExponentialAccelerationX = expAccelerationX;
+            ExponentialAccelerationY = expAccelerationY;
+        }
+    }
+
+    public struct AngularVelocityMoveToTarget(float angle, float targetX, float targetY, float posDifference)
+    {
+        public float AngleChange = angle;
+
+        public float TargetX = targetX;
+        public float TargetY = targetY;
+
+        public float PositionDifference = posDifference;
     }
 }

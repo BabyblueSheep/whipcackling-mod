@@ -17,6 +17,7 @@ using Whipcackling.Assets;
 using Whipcackling.Common.Systems.Drawing;
 using Whipcackling.Common.Utilities;
 using Whipcackling.Core.Particles;
+using Whipcackling.Core.Particles.Components;
 
 namespace Whipcackling.Content.Accessories.Summoner.MoonStone
 {
@@ -145,17 +146,19 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
             Gore.NewGore(Projectile.Center, Vector2.Zero, ModContent.GoreType<ExodiumRockGore2>());
             Gore.NewGore(Projectile.Center, Vector2.Zero, ModContent.GoreType<ExodiumRockGore3>());
 
-            /*for (int i = 0; i < 3; i++)
-                ParticleSystem.SpawnParticle(
-                    type: ParticleLoader.ParticleType<ExodiumGlowDot>(),
-                    position: Projectile.Center,
-                    velocity: Projectile.velocity * 0.3f,
-                    scale: new Vector2(Main.rand.NextFloat(0.9f, 1.1f) - i * 0.25f),
-                    rotation: Main.rand.NextFloat(MathHelper.TwoPi),
-                    color: new Color(i / 2f, 1f, 0.3f + i / 2f),
-                    lifetime: Main.rand.Next(20, 30),
-                    custom1: Main.rand.NextFloat(0.5f) // Decay
-                    );*/
+            for (int i = 0; i < 3; i++)
+                ParticleSystem.World.Create(
+                    (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["GlowDot"],
+                    (Position)Projectile.Center,
+                    (Scale)(new Vector2(Main.rand.NextFloat(0.9f, 1.1f) - i * 0.25f)),
+                    new Rotation(0),
+                    new Color(i / 2f, 1f, 0.3f + i / 2f, 0f),
+                    new LinearVelocityAcceleration(Projectile.velocity * 0.3f, 0, 0, 0.9f, 0.9f),
+                    new RotationIsVelocity(),
+                    new LinearScaleIncrease(-0.05f, -0.05f),
+                    new TimeLeft(Main.rand.Next(20, 30)),
+                    new TimeUntilAction(Main.rand.Next(10, 15))
+                    );
         }
 
         public override bool PreDraw(ref Color lightColor)

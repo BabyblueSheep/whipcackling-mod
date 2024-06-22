@@ -61,7 +61,7 @@ namespace Whipcackling.Common.Systems
                 if (npc.HasBuff<ProfanedCrystalWhipDebuff>() && Main.player[proj.owner].Calamity().pscState >= (int)ProfanedSoulCrystal.ProfanedSoulCrystalState.Buffs)
                 {
                     var empowered = Main.player[proj.owner].Calamity().pscState == (int)ProfanedSoulCrystal.ProfanedSoulCrystalState.Empowered;
-                    
+                    modifiers.ScalingBonusDamage += (empowered ? 0.4f : 0.2f) * tagMultiplier;
 
                     if (Main.netMode != NetmodeID.Server)
                     {

@@ -15,6 +15,7 @@ using Terraria.Localization;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
 using Whipcackling.Core.Particles;
+using Whipcackling.Core.Particles.Components;
 
 namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
 {
@@ -156,7 +157,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                 {
                     Vector2 speed = new(Main.rand.NextFloat(-1, 1), Main.rand.NextFloat(-0.9f, -1.1f));
                     Projectile proj = Projectile.NewProjectileDirect(whip.GetProjectileSource_FromThis(), target.Center - new Vector2(0, target.height * 0.75f), speed * 5, ProjectileID.Bone, (int)Math.Ceiling((double)whip.damage / amount), 0, whip.owner);
-                    proj.ranged = false/* tModPorter Suggestion: Remove. See Item.DamageType */;
+                    proj.DamageType = DamageClass.Summon;
                 }
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.SpinalTapTooltip")));
             TagConversions.Add(BuffID.FlameWhipEnemyDebuff, new((owner, whip, target, buffTime) =>
@@ -208,33 +209,31 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                     Projectile k = Projectile.NewProjectileDirect(whip.GetSource_FromThis(), npc.Center, Vector2.Zero, ModContent.ProjectileType<HolyAttack>(), 20, 0, whip.owner, ai1: npc.whoAmI);
                     k.Damage();
 
-                    Vector2 position = Vector2.Lerp(target.Center, npc.Center, 0.5f);
+                    Vector2 position = (target.Center + npc.Center) * 0.5f;
                     float rotation = (npc.Center - target.Center).ToRotation();
                     float distance = Vector2.Distance(target.Center, npc.Center);
 
-                    Color[] colors = new Color[]
-                    {
+                    Color[] colors =
+                    [
                         Color.Wheat, Color.Khaki, Color.PeachPuff
-                    };
+                    ];
 
                     for (int particleCount = 0; particleCount < 3; particleCount++)
                     {
-                        Vector2 positionMod = new(Main.rand.NextFloat(-3f, 3f), Main.rand.NextFloat(-3f, 3f));
+                        Vector2 positionMod = new(Main.rand.NextFloat(-0.5f, 0.5f), Main.rand.NextFloat(-0.5f, 0.5f));
+                        float rotationMod = Main.rand.NextFloat(-0.02f, 0.02f);
                         Vector2 scaleMod = new(Main.rand.NextFloat(-0.2f, 0.1f), Main.rand.NextFloat(-0.1f, 0.2f));
 
-                        /*ParticleSystem.SpawnParticle(
-                            type: ParticleLoader.ParticleType<HolyConnectedBeam>(),
-                            position: position + positionMod * distance * 0.0025f,
-                            velocity: Vector2.Zero,
-                            scale: new Vector2(0.5f, distance * 0.0125f) + scaleMod * distance * 0.0025f,
-                            rotation: rotation + MathHelper.PiOver2,
-                            color: colors[particleCount] * 0.5f,
-                            variant: 0,
-                            lifetime: 12 + Main.rand.Next(10),
-                            custom1: Main.rand.NextFloat(0.25f, 0.55f), // Decay
-                            custom2: target.whoAmI, // First NPC anchor
-                            custom3: npc.whoAmI // Second NPC anchor
-                        );*/
+                        ParticleSystem.World.Create(
+                            (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["ConnectedBeam"],
+                            (Position)(position + positionMod),
+                            (Scale)(new Vector2(0.5f, distance * 0.0125f) + scaleMod * distance * 0.0025f),
+                            (Rotation)(rotation + rotationMod + MathHelper.PiOver2),
+                            colors[particleCount].MultiplyRGBA(new Color(0.5f, 0.5f, 0.5f, 0)),
+                            new TimeLeft(12 + Main.rand.Next(10)),
+                            new LinearColorFade(5),
+                            new LinearScaleIncrease(-0.05f, 0)
+                            );
                     }
                 }
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.DurendalTooltip")));

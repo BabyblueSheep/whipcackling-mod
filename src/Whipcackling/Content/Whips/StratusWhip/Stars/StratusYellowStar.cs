@@ -43,6 +43,11 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
             Projectile.Kill();
         }
 
+        public override bool PreKill(int timeLeft)
+        {
+            return true;
+        }
+
         public override void HostileBehavior(NPC target)
         {
             
