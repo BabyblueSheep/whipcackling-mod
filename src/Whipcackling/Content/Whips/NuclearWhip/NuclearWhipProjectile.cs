@@ -125,7 +125,7 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
             #region Plane positions
             // Prepare Bezier curving
-            int accuracy = 10; // Accuracy of the Bezier curve. The bigger, the more accurate
+            int accuracy = 15; // Accuracy of the Bezier curve. The bigger, the more accurate
             _prevPositionsPlaneSmoothed ??= new Vector2[accuracy, Projectile.WhipSettings.Segments];
             Vector2 startPoint, endPoint, middlePoint;
             float middleIndex;

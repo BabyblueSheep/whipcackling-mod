@@ -89,7 +89,7 @@ namespace Whipcackling.Core.Particles.Queries
         {
             float value = Utils.GetLerpValue(0, fade.FadeInTime, time.Time, true) * Utils.GetLerpValue(time.TotalTime, time.TotalTime - fade.FadeOutTime, time.Time, true);
             byte alpha = (byte)(255 * value);
-            color.R = alpha; color.B = alpha; color.G = alpha;
+            color.R = (byte)(fade.Red * value); color.B = (byte)(fade.Green * value); color.G = (byte)(fade.Blue * value);
         }
     }
 }

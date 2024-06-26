@@ -54,7 +54,10 @@ namespace Whipcackling.Core.Particles
 
         public override void Unload()
         {
-            Atlas?.Dispose();
+            Main.QueueMainThreadAction(() =>
+            {
+                Atlas?.Dispose();
+            });
             Atlas = null;
             AtlasDefinitions.Clear();
         }

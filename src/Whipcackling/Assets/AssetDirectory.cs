@@ -24,9 +24,18 @@ namespace Whipcackling.Assets
                 }
             }
 
+            public static class Whips
+            {
+                public static class BloodstoneWhip
+                {
+                    public static readonly Asset<Texture2D> BloodstoneSkull = ModContent.Request<Texture2D>($"{AssetPath}Textures/Whips/BloodstoneWhip/BloodstoneSkull");
+                }
+            }
+
             public static class Extra
             {
                 public static readonly Asset<Texture2D> SineGradient = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/SineGradient");
+                public static readonly Asset<Texture2D> BlackHoleDither = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/BlackHoleDither");
 
                 public static class Noise
                 {
@@ -52,7 +61,6 @@ namespace Whipcackling.Assets
                 {
                     public static readonly Asset<Texture2D> AcidFlamePaletteHue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/AcidFlamePaletteHue");
                     public static readonly Asset<Texture2D> AuraBlackHolePaletteHue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/AuraBlackHolePaletteHue");
-                    public static readonly Asset<Texture2D> InnerBlackHolePaletteValue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/InnerBlackHolePaletteValue");
                     public static readonly Asset<Texture2D> ExodiumHealPaletteAlpha = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/ExodiumHealPaletteAlpha");
                     public static readonly Asset<Texture2D> OuterBlackHolePaletteValue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/OuterBlackHolePaletteValue");
                     public static readonly Asset<Texture2D> AcidFlameTrailPaletteHue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/AcidFlameTrailPaletteHue");
@@ -69,6 +77,8 @@ namespace Whipcackling.Assets
                     public static readonly Asset<Texture2D> WhiteStarHueTrail = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/WhiteStarHueTrail");
                     public static readonly Asset<Texture2D> PurpleStarHueTrail = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/PurpleStarHueTrail");
                     public static readonly Asset<Texture2D> YellowStarHueTrail = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/YellowStarHueTrail");
+                    public static readonly Asset<Texture2D> BlackHoleStrip = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/BlackHoleStrip");
+                    public static readonly Asset<Texture2D> BloodyTrailPaletteHue = ModContent.Request<Texture2D>($"{AssetPath}Textures/Extra/Palettes/BloodyTrailPaletteHue");
                 }
             }
         }
@@ -77,6 +87,7 @@ namespace Whipcackling.Assets
         {
             public static readonly Asset<Effect> BasicTrail = ModContent.Request<Effect>($"{AssetPath}Effects/BasicTrail");
             public static readonly Asset<Effect> BlackHole = ModContent.Request<Effect>($"{AssetPath}Effects/BlackHole");
+            public static readonly Asset<Effect> BlackHoleStripTrail = ModContent.Request<Effect>($"{AssetPath}Effects/BlackHoleStripTrail");
             public static readonly Asset<Effect> CalamitousOutline = ModContent.Request<Effect>($"{AssetPath}Effects/CalamitousOutline");
             public static readonly Asset<Effect> FieryOutline = ModContent.Request<Effect>($"{AssetPath}Effects/FieryOutline");
             public static readonly Asset<Effect> FlameTrail = ModContent.Request<Effect>($"{AssetPath}Effects/FlameTrail");

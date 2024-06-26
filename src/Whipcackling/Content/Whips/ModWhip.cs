@@ -178,28 +178,36 @@ namespace Whipcackling.Content.Whips
             Rectangle frame = texture.Frame(1, 5, 0, 0);
             int height = frame.Height;
             Vector2 position = points[0];
+            Vector2 difference = Vector2.Zero;
 
-            for (int i = 0; i < points.Count - 1; i++)
+            for (int i = 0; i < points.Count - 2; i++)
             {
                 Vector2 origin = frame.Size() * 0.5f;
 
                 if (i == 0)
                     origin.Y += HandleOffset;
-                else if (i == points.Count - 2)
-                    frame.Y = height * 4;
                 else
                     frame.Y = height * SegmentVariant(i);
 
-                Vector2 difference = points[i + 1] - points[i];
+                difference = points[i + 1] - points[i];
 
                 float rotation = difference.ToRotation() - MathHelper.PiOver2;
                 float scale = SegmentScale(i);
                 Color color = Lighting.GetColor(points[i].ToTileCoordinates());
 
+
                 Main.EntitySpriteDraw(texture.Value, position - Main.screenPosition, frame, color, rotation, origin, scale, SpriteEffects.None, 0);
 
                 position += difference;
             }
+
+            frame.Y = height * 4;
+
+            SpriteEffects direction = Projectile.direction == 1 ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+            Color tipColor = Lighting.GetColor(points[^1].ToTileCoordinates());
+            float tipRotation = difference.ToRotation() - MathHelper.PiOver2;
+
+            Main.EntitySpriteDraw(texture.Value, points[^2] - Main.screenPosition, frame, tipColor, tipRotation, frame.Size() * 0.5f, SegmentScale(points.Count - 2), direction, 0);
 
             DrawAheadWhip(ref lightColor);
 

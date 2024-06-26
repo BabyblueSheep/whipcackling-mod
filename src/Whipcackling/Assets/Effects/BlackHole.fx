@@ -1,12 +1,9 @@
-﻿sampler2D uImage0 : register(s0);
+sampler2D uImage0 : register(s0);
 
 float2 uResolution;
 float uTime;
 float uRadius; // Radius of the smoke
 float uHoleRadius; // Radius of the hole
-
-float4 uColorOuter; // Color of foreground gas
-float4 uColorInner; // Color of background gas
 
 texture uTextureNoise0;
 sampler2D texture0 = sampler_state
@@ -28,18 +25,8 @@ sampler2D texture1 = sampler_state
     AddressU = wrap;
     AddressV = wrap;
 };
-texture uTextureNoise2;
-sampler2D texture2 = sampler_state
-{
-    texture = <uTextureNoise2>;
-    magfilter = LINEAR;
-    minfilter = LINEAR;
-    mipfilter = LINEAR;
-    AddressU = wrap;
-    AddressV = wrap;
-};
 texture uTexturePalette0;
-sampler2D texturepal0 = sampler_state
+sampler2D texturepalhole = sampler_state
 {
     texture = <uTexturePalette0>;
     magfilter = POINT;
@@ -58,16 +45,18 @@ sampler2D texturepal1 = sampler_state
     AddressU = clamp;
     AddressV = clamp;
 };
-texture uTexturePalette2;
-sampler2D texturepal2 = sampler_state
+texture uTextureDither;
+sampler2D texturedither = sampler_state
 {
-    texture = <uTexturePalette2>;
+    texture = <uTextureDither>;
     magfilter = POINT;
     minfilter = POINT;
     mipfilter = POINT;
     AddressU = wrap;
     AddressV = wrap;
 };
+
+static const float EDGE_RADIUS = 0.3;
 
 
 void cartesianToPolar(float2 coords, out float angle, out float radius)
@@ -91,57 +80,100 @@ float inverselerp(float from, float to, float value)
 
 float4 PixelShaderFunction(float4 baseColor : COLOR0, float2 coords : TEXCOORD0) : COLOR0
 {
+    float4 brightest_color = tex2D(texturepal1, float2(1, 0));
+    float4 almost_brightest_color = tex2D(texturepal1, float2(0.66, 0));
+    float4 almost_darkest_color = tex2D(texturepal1, float2(0.33, 0));
+    float4 darkest_color = tex2D(texturepal1, float2(0, 0));
+    
+    float4 dither = tex2D(texturedither, coords * uResolution * 0.5);
+    
     //Pixelate
     coords.x -= coords.x % (1 / uResolution.x);
     coords.y -= coords.y % (1 / uResolution.y);
     
     float angle, radius;
-    
     cartesianToPolar(coords, angle, radius); // Convert coordinates to angle and radius
     
-    // Add wobbling to the gas and hole edges
-    float wobble = tex2D(texture2, float2(radius + uTime - uRadius, angle));
-    float origRadius = radius;
-    radius *= wobble * 5;
-    radius -= wobble * 2;
-    radius -= uRadius;
-    origRadius *= lerp(wobble, 1, 0.6);
+    float holeRadius = radius;
+    float wobble = tex2D(texture1, float2(radius + uTime - uRadius, angle)) + 1;
+    holeRadius *= wobble * 5;
+    holeRadius -= wobble * 2;
+    holeRadius -= uRadius;
     
-    float2 outerCoords1 = float2(((radius * 0.4 + uTime * 0.3) % 1), -angle - uTime * 0.3 - radius * 0.1);
-    float2 outerCoords2 = float2(((radius * 0.3 + uTime * 0.2) % 1), angle + uTime * 0.1 + radius * 0.3);
-    float4 outerGas1 = tex2D(texture0, outerCoords1); // Outer, brighter gas
-    float4 outerGas2 = tex2D(texture0, outerCoords2);
+    float gasRadius = radius;
+    gasRadius /= wobble * 0.6;
+    gasRadius -= wobble * 0.2;
+    gasRadius -= uRadius;
     
-    float2 innerCoords1 = polarToCartesian(angle + uTime * 0.1 + radius * 0.2, radius + 0.1 + sin(uTime) * 0.2); // Inner, darker background gas
-    float2 innerCoords2 = polarToCartesian(angle - uTime * 0.2 - radius * 0.3 + cos(uTime) * 0.01, radius);
-    float4 innerGas1 = tex2D(texture1, innerCoords1);
-    float4 innerGas2 = tex2D(texture1, innerCoords2);
+    float4 outergas =
+    tex2D(texture0, float2(angle + uTime * 0.9, gasRadius * 0.7 + uTime))
+    * tex2D(texture0, float2(angle - uTime * 0.7, gasRadius * 0.5 + uTime * 1.2)) * 2;
     
-    float4 innerResult = innerGas1 * innerGas2 * 5;
-    innerResult *= inverselerp(1.05, 0.85, radius);
-    innerResult *= inverselerp(0.8, 0.6, radius);
-    innerResult = tex2D(texturepal1, float2(innerResult.x, 0)) * uColorInner;
+    outergas *= 1 - gasRadius * 1.2;
     
-    float4 outerResult = outerGas1 * outerGas2;
-    outerResult *= inverselerp(1.2, 0.8, radius);
-    outerResult *= inverselerp(0.8, 0.6, radius);
-    outerResult = tex2D(texturepal0, float2(outerResult.x, 0)) * uColorOuter;
-    
-    float4 gas = outerResult + innerResult;
-
-    if (origRadius < uHoleRadius) // The hole itself
+    // Kinda naive dithering for gas for a smoother gradient
+    if (outergas.r > 0.9)
+        outergas = brightest_color;
+    else
     {
-        if (origRadius > uHoleRadius - 0.015)
-        {
-            gas = tex2D(texturepal2, float2(angle + uTime, origRadius));
-        }
+        if (outergas.r > 0.85)
+            outergas = dither.r == 0 ? almost_brightest_color : brightest_color;
         else
         {
-            gas = float4(0, 0, 0, 1);
+            if (outergas.r > 0.8)
+                outergas = almost_brightest_color;
+            else
+            {
+                if (outergas.r > 0.75)
+                    outergas = dither.r == 0 ? 0 : almost_brightest_color;
+                else
+                    outergas = 0;
+            }
         }
     }
     
-    return gas;
+    float4 innergas =
+    tex2D(texture0, float2(angle + uTime * 0.8, gasRadius * 0.7 + uTime * 0.9))
+    * tex2D(texture0, float2(angle - uTime * 0.6, gasRadius * 0.5 + uTime)) * 2;
+    innergas *= 1 - gasRadius * 2;
+
+    // Kinda naive dithering for gas for a smoother gradient
+    if (innergas.r > 0.5)
+        innergas = almost_darkest_color;
+    else
+    {
+        if (innergas.r > 0.3)
+            innergas = dither.r == 0 ? darkest_color : almost_darkest_color;
+        else
+        {
+            if (innergas.r > 0.1)
+                innergas = darkest_color;
+            else
+            {
+                if (innergas.r > 0)
+                    innergas = dither.r == 0 ? 0 : darkest_color;
+                else
+                    innergas = 0;
+            }
+        }
+    }
+    
+    float4 result = outergas.r > 0.2 ? outergas : innergas;
+    result.a = 0;
+    
+    if (holeRadius < uHoleRadius) // The hole itself
+    {
+        if (holeRadius > uHoleRadius - EDGE_RADIUS)
+        {
+            result = tex2D(texturepalhole, float2(inverselerp(uHoleRadius, uHoleRadius - EDGE_RADIUS, holeRadius), 0));
+        }
+        else
+        {
+            result = float4(0, 0, 0, 1);
+        }
+    }
+    
+    return result;
 }
 
 technique Technique1

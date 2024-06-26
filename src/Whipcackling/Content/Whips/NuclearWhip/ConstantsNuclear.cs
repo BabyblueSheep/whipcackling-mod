@@ -29,5 +29,8 @@ namespace Whipcackling.Content.Whips.NuclearWhip
 
         //The additive tag damage of the whip.
         public static int TagDamage(int enemiesTagged) => 20 + 5 * (int)Math.Ceiling(Math.Pow(enemiesTagged, 0.3));
+
+        // The critical strike chance of the tag debuff.
+        public static int TagCritChance => 8;
     }
 }

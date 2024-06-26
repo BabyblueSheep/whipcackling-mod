@@ -47,9 +47,11 @@ namespace Whipcackling.Core.Particles
             World.InlineQuery<UpdateLinearVelocity, Position, LinearVelocityAcceleration>(UpdateLinearVelocity.Query);
             World.InlineQuery<UpdateAngularVelocityMoveToTarget, Position, AngularVelocityMoveToTarget>(UpdateAngularVelocityMoveToTarget.Query);
             World.InlineQuery<UpdateLinearVelocityTimed, Position, LinearVelocityExponentialAccelerationTimed, TimeLeft, TimeUntilAction>(UpdateLinearVelocityTimed.Query);
+            World.InlineQuery<UpdateInnacurateHomeOnTarget, Position, LinearVelocityAcceleration, InnacurateHomeOnTarget>(UpdateInnacurateHomeOnTarget.Query);
 
             World.InlineQuery<UpdateLinearScale, Scale, LinearScaleIncrease>(UpdateLinearScale.Query);
             World.InlineQuery<UpdateExponentialScale, Scale, ExponentialScaleIncrease>(UpdateExponentialScale.Query);
+            World.InlineQuery<UpdateScaleWithVelocityAndLinearIncrease, Scale, LinearVelocityAcceleration, ScaleWithVelocityAndLinearIncrease>(UpdateScaleWithVelocityAndLinearIncrease.Query);
 
             World.InlineQuery<UpdateLinearScaleTimed, Scale, LinearScaleIncrease, TimeLeft, TimeUntilAction>(UpdateLinearScaleTimed.Query);
             World.InlineQuery<UpdateExponentialScaleTimed, Scale, ExponentialScaleIncrease, TimeLeft, TimeUntilAction>(UpdateExponentialScaleTimed.Query);

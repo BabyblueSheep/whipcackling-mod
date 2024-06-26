@@ -35,7 +35,7 @@ MoonStone: {
 	Tooltip:
 		'''
 		Minions move and act faster, but deal 30% less damage
-		Minions also passively generate lunar charge whilst moving
+		Minions also passively builds up lunar charge whilst moving
 		When fully charged, they will heal allies or perform an attack when targetting an enemy
 		'One of the ancient relics'
 		'''

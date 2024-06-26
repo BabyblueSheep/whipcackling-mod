@@ -55,7 +55,7 @@ namespace Whipcackling.Content.Whips.StratusWhip
             if (progress > 0.1f)
             {
                 int id = Main.rand.NextBool() ? (int)CalamityDusts.BlueCosmilite : (int)CalamityDusts.PurpleCosmilite;
-                Rectangle rectangle = Utils.CenteredRectangle(Projectile.WhipPointsForCollision[^2], new Vector2(30f));
+                Rectangle rectangle = Utils.CenteredRectangle(Projectile.WhipPointsForCollision[^1], new Vector2(30f));
                 Dust dust = Dust.NewDustDirect(rectangle.TopLeft(), rectangle.Width, rectangle.Height, id, 0f, 0f, 0, Color.White, progress);
                 dust.noGravity = true;
                 dust.velocity *= 0.8f;

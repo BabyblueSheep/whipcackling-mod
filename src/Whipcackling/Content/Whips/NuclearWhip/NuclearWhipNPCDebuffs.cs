@@ -37,6 +37,11 @@ namespace Whipcackling.Content.Whips.NuclearWhip
                 return;
             float projTagMultiplier = ProjectileID.Sets.SummonTagDamageMultiplier[projectile.type];
             modifiers.FlatBonusDamage += ConstantsNuclear.TagDamage(TaggedAmount) * projTagMultiplier;
+
+            if (Main.rand.Next(100) < ConstantsNuclear.TagCritChance)
+            {
+                modifiers.SetCrit();
+            }
         }
     }
 

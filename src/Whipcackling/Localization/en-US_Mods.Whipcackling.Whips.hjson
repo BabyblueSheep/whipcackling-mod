@@ -24,6 +24,7 @@ MeldWhip: {
 	MeldExplosion.DisplayName: Meldic Explosion
 	MeldWhipProjectile.DisplayName: Trail of Cessation
 	MeldWhipCooldown: Black Hole Tag Cooldown
+	BlackHoleStrip.DisplayName: Black Hole Strip
 }
 
 NuclearWhip: {
@@ -36,6 +37,8 @@ NuclearWhip: {
 		DisplayName: Plutonium Hunger
 		Tooltip:
 			'''
+			8% summon tag critical strike chance
+			25 summon tag damage
 			{$CommonItemTooltip.Whips}
 			Tagged enemies recieve more damage the more enemies are tagged
 			'Fläsyn!'
@@ -93,9 +96,17 @@ StratusWhip: {
 
 BloodstoneWhip: {
 	BloodstoneWhip: {
-		DisplayName: Bloodstone Whip
-		Tooltip: ""
+		DisplayName: Hemoptysis
+		Tooltip:
+			'''
+			30 summon tag damage
+			10% summon tag critical strike chance
+			{$CommonItemTooltip.Whips}
+			Minion hits build up blood energy
+			Right click to release blood energy to awaken the whip
+			The awakened whip will breathe fire at enemies when swung
+			'''
 	}
 
-	BloodstoneWhipProjectile.DisplayName: Bloodstone Whip Projectile
+	BloodstoneWhipProjectile.DisplayName: Hemoptysis
 }

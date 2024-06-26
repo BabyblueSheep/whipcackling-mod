@@ -28,5 +28,11 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
 
         //The amount of segments on the whip. Practically visual.
         public static int WhipSegments => 45;
+
+        //The additive tag damage of the whip.
+        public static int TagDamage => 30;
+
+        // The critical strike chance of the tag debuff.
+        public static int TagCritChance => 10;
     }
 }

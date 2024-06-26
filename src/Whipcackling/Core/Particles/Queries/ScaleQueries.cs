@@ -34,4 +34,18 @@ namespace Whipcackling.Core.Particles.Queries
             scale.Y *= increase.IncreaseY;
         }
     }
+
+    public struct UpdateScaleWithVelocityAndLinearIncrease : IForEach<Scale, LinearVelocityAcceleration, ScaleWithVelocityAndLinearIncrease>
+    {
+        public static QueryDescription Query => new QueryDescription().WithAll<Scale, LinearVelocityAcceleration, ScaleWithVelocityAndLinearIncrease>();
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public readonly void Update(ref Scale scale, ref LinearVelocityAcceleration velocity, ref ScaleWithVelocityAndLinearIncrease increase)
+        {
+            scale.X = velocity.VelocityX * increase.VelocityModifierX + increase.LinearModifierX;
+            if (scale.X < 0) scale.X = 0;
+            scale.Y = velocity.VelocityY * increase.VelocityModifierY + increase.LinearModifierY;
+            if (scale.Y < 0) scale.Y = 0;
+        }
+    }
 }

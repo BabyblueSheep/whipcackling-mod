@@ -36,4 +36,13 @@ namespace Whipcackling.Core.Particles.Components
         public float IncreaseX = increaseX;
         public float IncreaseY = increaseY;
     }
+
+    public struct ScaleWithVelocityAndLinearIncrease(float increaseX, float increaseY, float speedX, float speedY)
+    {
+        public float LinearModifierX = increaseX;
+        public float LinearModifierY = increaseY;
+
+        public float VelocityModifierX = speedY;
+        public float VelocityModifierY = speedX;
+    }
 }

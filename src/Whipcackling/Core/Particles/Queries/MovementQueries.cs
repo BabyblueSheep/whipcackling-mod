@@ -1,13 +1,8 @@
 ﻿using Arch.Core;
-using CalamityMod.Particles;
+using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using Terraria.Graphics.Renderers;
+using Whipcackling.Common.Utilities;
 using Whipcackling.Core.Particles.Components;
 
 namespace Whipcackling.Core.Particles.Queries
@@ -50,6 +45,18 @@ namespace Whipcackling.Core.Particles.Queries
 
             position.X = newX + velocity.TargetX;
             position.Y = newY + velocity.TargetY;
+        }
+    }
+
+    public struct UpdateInnacurateHomeOnTarget : IForEach<Position, LinearVelocityAcceleration, InnacurateHomeOnTarget>
+    {
+        public static QueryDescription Query => new QueryDescription().WithAll<Position, LinearVelocityAcceleration, InnacurateHomeOnTarget>();
+
+        public void Update(ref Position position, ref LinearVelocityAcceleration velocity, ref InnacurateHomeOnTarget home)
+        {
+            Vector2 speed = HelperMethods.RotateTowards((Vector2)(velocity), (Vector2)(position), home.Target, home.AngleChange);
+            velocity.VelocityX = speed.X;
+            velocity.VelocityY = speed.Y;
         }
     }
 }

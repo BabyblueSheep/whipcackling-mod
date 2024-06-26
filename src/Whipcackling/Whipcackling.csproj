@@ -18,6 +18,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Remove="assets\effects\BlackHoleStripTrail.fx" />
       <None Remove="assets\effects\ParticleOld.fx" />
     </ItemGroup>
 

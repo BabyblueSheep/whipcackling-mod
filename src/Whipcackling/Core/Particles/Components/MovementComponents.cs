@@ -27,6 +27,16 @@ namespace Whipcackling.Core.Particles.Components
         public float ExponentialAccelerationX;
         public float ExponentialAccelerationY;
 
+        public static explicit operator Vector2(LinearVelocityAcceleration velocity)
+        {
+            return new Vector2(velocity.VelocityX, velocity.VelocityY);
+        }
+
+        public static explicit operator LinearVelocityAcceleration(Vector2 vector)
+        {
+            return new LinearVelocityAcceleration(vector.X, vector.Y);
+        }
+
         public LinearVelocityAcceleration(float velocityX, float velocityY, float accelerationX = 0, float accelerationY = 0, float expAccelerationX = 1, float expAccelerationY = 1)
         {
             VelocityX = velocityX;
@@ -95,5 +105,12 @@ namespace Whipcackling.Core.Particles.Components
         public float TargetY = targetY;
 
         public float PositionDifference = posDifference;
+    }
+
+    public struct InnacurateHomeOnTarget(float targetX, float targetY, float angle)
+    {
+        public float AngleChange = angle;
+
+        public Vector2 Target = new Vector2(targetX, targetY);
     }
 }

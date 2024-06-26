@@ -27,7 +27,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
             get => Projectile.ai[1] > 0;
             set => Projectile.ai[1] = value ? 1 : 0;
         }
-        public int Size => 50 + 100 * (int)Strength;
+        public int Size => 32 + 128 * (int)Strength;
 
         public float Timer => TotalTime - Projectile.timeLeft;
         public float TimeCompletion => Timer / TotalTime;
@@ -221,9 +221,25 @@ namespace Whipcackling.Content.Whips.MeldWhip
             }
             _noise.SetFrequency(MathHelper.Lerp(0.6f, 0.4f, Easings.OutQuart(TimeCompletion)));
 
+            float lightStrength = Utils.GetLerpValue(0, 10, Timer, true) * Utils.GetLerpValue(TotalTime, TotalTime - 10, Timer, true) * Strength * 5;
+            Lighting.AddLight(Projectile.Center, 0.6f * lightStrength, 0.9f * lightStrength, 1f * lightStrength);
+
             if (BlackHole && Projectile.timeLeft > 20)
             {
-                if (Main.rand.Next(5) % 1 == 0)
+                if (Projectile.timeLeft % 20 == 0 || Main.rand.Next(20) == 0)
+                {
+                    Vector2 position = Projectile.Center + new Vector2(Size, 0).RotatedByRandom(Math.PI * 2);
+                    Projectile.NewProjectile(
+                        spawnSource: Projectile.GetSource_FromThis(),
+                        position: position,
+                        velocity: (Projectile.Center - position).SafeNormalize(Vector2.Zero).RotatedBy(0.5f * (Main.rand.NextBool() ? 1 : -1)) * 15,
+                        Type: ModContent.ProjectileType<BlackHoleStrip>(),
+                        Damage: 0,
+                        KnockBack: 0,
+                        ai0: Projectile.Center.X,
+                        ai1: Projectile.Center.Y);
+                }
+                if (Main.rand.Next(5) == 0)
                 {
                     int tileCenterX = (int)(Projectile.Center.X / 16f);
                     int tileCenterY = (int)(Projectile.Center.Y / 16f);
@@ -235,17 +251,18 @@ namespace Whipcackling.Content.Whips.MeldWhip
                     if (!tile.HasTile)
                     {
                         float angle = Main.rand.NextFloat(-0.1f, 0.1f);
+
                         ParticleSystem.World.Create(
-                            (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["StarBig"],
+                            (UVCoordinates)ParticleAtlasSystem.AtlasDefinitions["GlowDot"],
                             (Position)randomPos,
-                            (Scale)(new Vector2(Main.rand.NextFloat(1.5f, 3f))),
-                            new Rotation(Main.rand.NextFloat(MathHelper.TwoPi)),
+                            (Scale)(new Vector2(Main.rand.NextFloat(1f, 2f))),
+                            new Rotation(Utils.AngleFrom(Projectile.Center, randomPos) + MathHelper.PiOver2),
                             new Color(0, 0, 0, 0),
-                            new TimeLeft(Main.rand.Next(20, 35)),
+                            new TimeLeft(Main.rand.Next(30, 55)),
                             new AngularVelocityMoveToTarget(angle, Projectile.Center.X, Projectile.Center.Y, 0.05f),
-                            new LinearRotationChange(angle),
-                            new ExponentialScaleIncrease(0.95f, 0.95f),
-                            new AlphaFadeInOut(5, 5)
+                            new RotationIsVelocity(),
+                            new LinearScaleIncrease(-0.05f, -0.05f),
+                            new AlphaFadeInOut(5, 5, 120, 255, 255)
                             );
                     }
                     else
@@ -302,33 +319,29 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 blackHoleEffect.Parameters["uTime"].SetValue(Main.GlobalTimeWrappedHourly * (1 + Projectile.whoAmI * 0.01f) + Projectile.whoAmI);
                 blackHoleEffect.Parameters["uResolution"].SetValue(new Vector2(Size * 0.5f));
                 blackHoleEffect.Parameters["uRadius"].SetValue(
-                    MathHelper.Lerp(-2, 0.1f, 
+                    MathHelper.Lerp(-1.2f, 0, 
                     Timer < 25 ?
                     Easings.OutCirc(Utils.GetLerpValue(5, 25, Timer, true)) :
                     Easings.InCirc(Utils.GetLerpValue(TotalTime, TotalTime - 20, Timer, true))
                     ));
                 blackHoleEffect.Parameters["uHoleRadius"].SetValue(
-                    MathHelper.Lerp(0, 0.1f,
+                    MathHelper.Lerp(-2.4f, -0.7f,
                     Timer < 20 ?
                     Easings.OutSine(Utils.GetLerpValue(0, 20, Timer, true)) :
                     Easings.InSine(Utils.GetLerpValue(TotalTime - 5, TotalTime - 25, Timer, true))
                     ));
 
-                blackHoleEffect.Parameters["uColorOuter"].SetValue(new Vector4(0.5f, 0.9f, 0.7f, 1));
-                blackHoleEffect.Parameters["uColorInner"].SetValue(new Vector4(0.3f, 0.5f, 0.5f, 1));
-
                 blackHoleEffect.Parameters["uTextureNoise0"].SetValue(AssetDirectory.Textures.Extra.Noise.GassyNoise.Value);
-                blackHoleEffect.Parameters["uTextureNoise1"].SetValue(AssetDirectory.Textures.Extra.Noise.BlurredDarkPerlinNoise.Value);
-                blackHoleEffect.Parameters["uTextureNoise2"].SetValue(AssetDirectory.Textures.Extra.Noise.WobblyNoise.Value);
-                blackHoleEffect.Parameters["uTexturePalette0"].SetValue(AssetDirectory.Textures.Extra.Palettes.OuterBlackHolePaletteValue.Value);
-                blackHoleEffect.Parameters["uTexturePalette1"].SetValue(AssetDirectory.Textures.Extra.Palettes.InnerBlackHolePaletteValue.Value);
-                blackHoleEffect.Parameters["uTexturePalette2"].SetValue(AssetDirectory.Textures.Extra.Palettes.AuraBlackHolePaletteHue.Value);
+                blackHoleEffect.Parameters["uTextureNoise1"].SetValue(AssetDirectory.Textures.Extra.Noise.WobblyNoise.Value);
+                blackHoleEffect.Parameters["uTexturePalette0"].SetValue(AssetDirectory.Textures.Extra.Palettes.AuraBlackHolePaletteHue.Value);
+                blackHoleEffect.Parameters["uTexturePalette1"].SetValue(AssetDirectory.Textures.Extra.Palettes.OuterBlackHolePaletteValue.Value);
+                blackHoleEffect.Parameters["uTextureDither"].SetValue(AssetDirectory.Textures.Extra.BlackHoleDither.Value);
 
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, blackHoleEffect, Main.GameViewMatrix.TransformationMatrix);
 
                 Texture2D empty = AssetDirectory.Textures.Pixel.Value;
-                Main.spriteBatch.Draw(empty, Projectile.Center - Main.screenPosition, empty.Frame(), Color.White, 0, empty.Size() * 0.5f, Size, SpriteEffects.None, 0);
+                Main.spriteBatch.Draw(empty, Projectile.Center - Main.screenPosition, empty.Frame(), Color.White, 0, empty.Size() * 0.5f, Size * 0.5f, SpriteEffects.None, 0);
 
                 Main.spriteBatch.End();
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, Main.DefaultSamplerState, DepthStencilState.None, Main.Rasterizer, null, Main.GameViewMatrix.TransformationMatrix);
