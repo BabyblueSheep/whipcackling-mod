@@ -11,6 +11,8 @@ Keybinds.ExpandTooltip.DisplayName: Expand Tooltip
 Projectiles: {
 	StratusRedStar.DisplayName: Stratus Red Star
 	StratusYellowStarMini.DisplayName: Stratus Yellow Star Mini
+	BloodFlames.DisplayName: Blood Flames
+	Sparkle.DisplayName: Sparkle
 }
 
 Items: {

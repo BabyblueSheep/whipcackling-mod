@@ -1,12 +1,13 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.ModLoader;
-using Whipcackling.Content.Whips.NuclearWhip;
+using Terraria.UI;
+using Whipcackling.Content.Accessories.Summoner.MoonStone;
 
 namespace Whipcackling.Content.Whips.BloodstoneWhip
 {
@@ -41,6 +42,10 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
             {
                 modifiers.SetCrit();
             }
+
+            BloodstoneWhipPlayer modPlayer = Main.player[projectile.owner].GetModPlayer<BloodstoneWhipPlayer>();
+            float multiplier = modPlayer.IsAwakened ? 0.4f : 1f;
+            modPlayer.BloodCharge += 0.005f * projTagMultiplier * multiplier;
         }
     }
 }

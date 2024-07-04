@@ -87,9 +87,10 @@ namespace Whipcackling.Core.Particles.Queries
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly void Update(ref Color color, ref AlphaFadeInOut fade, ref TimeLeft time)
         {
-            float value = Utils.GetLerpValue(0, fade.FadeInTime, time.Time, true) * Utils.GetLerpValue(time.TotalTime, time.TotalTime - fade.FadeOutTime, time.Time, true);
+            float value = Utils.GetLerpValue(0, fade.FadeOutTime, time.Time, true) * Utils.GetLerpValue(time.TotalTime, time.TotalTime - fade.FadeInTime, time.Time, true);
             byte alpha = (byte)(255 * value);
             color.R = (byte)(fade.Red * value); color.B = (byte)(fade.Green * value); color.G = (byte)(fade.Blue * value);
+            color.A = (byte)(fade.Alpha * value);
         }
     }
 }

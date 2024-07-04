@@ -26,6 +26,8 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
     {
         public override string LocalizationCategory => "Whips.BloodstoneWhip";
 
+        public ref float BreathTimer => ref Projectile.ai[2];
+
         public override SoundStyle SwingSound => SoundID.Item153;
         public override Color StringColor => new(122, 10, 60);
         public override int HandleOffset => 8;
@@ -88,6 +90,31 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
                 _prevPositionsPlane[0, x] = Projectile.WhipPointsForCollision[x];
             }
             #endregion
+
+            if (!Main.player[Projectile.owner].GetModPlayer<BloodstoneWhipPlayer>().IsAwakened)
+                return;
+
+            if (progress > 0.8f)
+                BreathTimer++;
+            else
+                BreathTimer--;
+
+            BreathTimer = MathHelper.Clamp(BreathTimer, 0, 3);
+
+            if (BreathTimer == 3)
+            {
+                if (Timer % 3 == 0)
+                    return;
+                int nearest = Projectile.FindTargetIgnoreCollision(1200, true);
+                if (nearest == -1)
+                    return;
+                NPC nearestNPC = Main.npc[nearest];
+                Vector2 velocity = nearestNPC.Center - Projectile.WhipPointsForCollision[^1];
+                velocity.Normalize();
+                velocity *= 8;
+
+                Projectile.NewProjectile(Projectile.GetProjectileSource_FromThis(), Projectile.WhipPointsForCollision[^1], velocity, ModContent.ProjectileType<BloodFlames>(), (int)(Projectile.damage * 0.2f), 0.425f, Projectile.owner);
+            }
         }
 
         public override void OnHitNPC(NPC target, NPC.HitInfo hit, int damageDone)
@@ -96,6 +123,7 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
             Projectile.damage = (int)(Projectile.damage * (1f - ConstantsBloodstone.DamageFalloff));
 
             target.AddBuff(ModContent.BuffType<BurningBlood>(), 240);
+            target.AddBuff(ModContent.BuffType<BloodstoneWhipNPCDebuff>(), ConstantsBloodstone.TagDuration);
         }
 
         public override void DrawAheadWhip(ref Color lightColor)
@@ -106,7 +134,14 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
             SpriteEffects direction = Projectile.direction == 1 ? SpriteEffects.None : SpriteEffects.FlipHorizontally;
 
             Asset<Texture2D> texture = AssetDirectory.Textures.Whips.BloodstoneWhip.BloodstoneSkull;
-            Rectangle frame = texture.Frame(1, 5, 0, 0);
+
+            int frameNum = 0;
+            if (Main.player[Projectile.owner].GetModPlayer<BloodstoneWhipPlayer>().IsAwakened)
+            {
+                frameNum = (int)(BreathTimer + 1);
+            }
+
+            Rectangle frame = texture.Frame(1, 5, 0, frameNum);
             int i = points.Count - 2;
 
             Vector2 position = points[i];

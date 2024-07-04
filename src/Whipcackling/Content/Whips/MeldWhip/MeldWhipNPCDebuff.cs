@@ -237,7 +237,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 effect.CurrentTechnique.Passes[0].Apply();
 
                 float angle = Main.GlobalTimeWrappedHourly * 5 + i / 3 * MathHelper.TwoPi;
-                Vector2 offset = new((float)Math.Cos(angle), (float)Math.Sin(angle));
+                Vector2 offset = new(MathF.Cos(angle), MathF.Sin(angle));
                 Main.spriteBatch.Draw(RenderTargets[layer], Main.screenLastPosition - Main.screenPosition + offset * 2, null, Color.White, 0f, Vector2.Zero, 1f, SpriteEffects.None, 0f);
             }
 

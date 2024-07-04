@@ -36,11 +36,12 @@ namespace Whipcackling.Core.Particles.Components
         public Color ThirdColor = color3;
     }
 
-    public struct AlphaFadeInOut(int fadeIn, int fadeOut, int red, int green, int blue)
+    public struct AlphaFadeInOut(int fadeIn, int fadeOut, int red, int green, int blue, int alpha)
     {
         public int Red = red;
         public int Green = green;
         public int Blue = blue;
+        public int Alpha = alpha;
 
         public int FadeInTime = fadeIn;
         public int FadeOutTime = fadeOut;

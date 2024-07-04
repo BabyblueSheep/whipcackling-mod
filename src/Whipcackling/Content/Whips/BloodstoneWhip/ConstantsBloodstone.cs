@@ -34,5 +34,8 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
 
         // The critical strike chance of the tag debuff.
         public static int TagCritChance => 10;
+
+        //The duration of the normal tag debuff.
+        public static int TagDuration => 60 * 4;
     }
 }

@@ -87,13 +87,13 @@ namespace Whipcackling.Content.Whips.MeldWhip
         public static float WhipRadiusCalc(float hits)
         {
             hits %= ConstantsMeld.BlackHoleHitsByWhip;
-            return 0.1f / (ConstantsMeld.BlackHoleHitsByWhip - (float)Math.Pow(1.25, hits));
+            return 0.1f / (ConstantsMeld.BlackHoleHitsByWhip - MathF.Pow(1.25f, hits));
         }
 
         public static float WhipInnerRadiusCalc(float hits)
         {
             hits %= ConstantsMeld.BlackHoleHitsByWhip;
-            return 0.1f / (ConstantsMeld.BlackHoleHitsByWhip + 2 - (float)Math.Pow(1.3, hits));
+            return 0.1f / (ConstantsMeld.BlackHoleHitsByWhip + 2 - MathF.Pow(1.3f, hits));
         }
 
         public override void PreSaveAndQuit()

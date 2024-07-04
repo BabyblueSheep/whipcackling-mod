@@ -103,10 +103,15 @@ BloodstoneWhip: {
 			10% summon tag critical strike chance
 			{$CommonItemTooltip.Whips}
 			Minion hits build up blood energy
-			Right click to release blood energy to awaken the whip
+			Right click to release blood energy when full to awaken the whip
 			The awakened whip will breathe fire at enemies when swung
 			'''
 	}
 
 	BloodstoneWhipProjectile.DisplayName: Hemoptysis
+
+	BloodstoneWhipNPCDebuff: {
+		DisplayName: Bloody Tag
+		Description: kidney stones
+	}
 }

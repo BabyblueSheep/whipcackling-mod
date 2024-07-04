@@ -66,8 +66,8 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
 
             for (int i = 0; i < 129; i++)
             {
-                double rad = i / 128f * Math.PI * 2;
-                Vector2 offset = new((float)Math.Sin(rad), (float)Math.Cos(rad));
+                float rad = i / 128f * MathF.PI * 2;
+                Vector2 offset = new(MathF.Sin(rad), MathF.Cos(rad));
                 float radOffset = 1 + _noise.GetNoise(offset.X, offset.Y) * 0.1f;
 
                 positions[i] = Projectile.Center + offset * size * 0.5f * radOffset * Easings.OutQuart(Utils.GetLerpValue(0, TotalTime - 10, Timer, true));
@@ -77,7 +77,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
             rotations[0] = rotations[128];
 
             Color ShockwaveColor(float p) => Color.PaleGreen;
-            float ShockwaveWidth(float p) => (8 + (float)Math.Pow(1.5f, width)) * Utils.GetLerpValue(TotalTime - 10, 5, Timer, true) * Utils.GetLerpValue(0, 5, Timer, true);
+            float ShockwaveWidth(float p) => (8 + MathF.Pow(1.5f, width)) * Utils.GetLerpValue(TotalTime - 10, 5, Timer, true) * Utils.GetLerpValue(0, 5, Timer, true);
 
             _strip.PrepareStrip(positions, rotations, ShockwaveColor, ShockwaveWidth, -Main.screenPosition, 129, true);
 

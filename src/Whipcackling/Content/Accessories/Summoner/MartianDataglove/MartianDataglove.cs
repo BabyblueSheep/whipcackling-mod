@@ -174,7 +174,7 @@ namespace Whipcackling.Content.Accessories.Summoner.MartianDataglove
                     if (counter == 2)
                         return;
                 }
-                Projectile proj = Projectile.NewProjectileDirect(whip.GetProjectileSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<LessCoolFlake>(), 5, 0, whip.owner, ai2: (float)Math.Ceiling(buffTime / 4f));
+                Projectile proj = Projectile.NewProjectileDirect(whip.GetProjectileSource_FromThis(), target.Center, Vector2.Zero, ModContent.ProjectileType<LessCoolFlake>(), 5, 0, whip.owner, ai2: MathF.Ceiling(buffTime / 4f));
             }, Language.GetOrRegister($"Mods.Whipcackling.Accessories.MartianDataglove.CoolWhipTooltip")));
             TagConversions.Add(BuffID.SwordWhipNPCDebuff, new((owner, whip, target, buffTime) =>
             {

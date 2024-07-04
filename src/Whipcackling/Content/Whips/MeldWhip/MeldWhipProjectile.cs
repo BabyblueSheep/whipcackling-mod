@@ -63,7 +63,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                 Vector2 spinningPoint = Projectile.WhipPointsForCollision[index] - Projectile.WhipPointsForCollision[index - 1];
                 dust.fadeIn = 0.1f;
                 dust.noGravity = true;
-                dust.velocity += spinningPoint.RotatedBy(Main.player[Projectile.owner].direction * ((float)Math.PI / 2f));
+                dust.velocity += spinningPoint.RotatedBy(Main.player[Projectile.owner].direction * (MathF.PI / 2f));
                 dust.velocity *= 0.5f;
             }
 

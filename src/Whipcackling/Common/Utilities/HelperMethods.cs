@@ -95,7 +95,7 @@ namespace Whipcackling.Common.Utilities
         /// <param name="projectile">The projectile instance.</param>
         /// <param name="maxRange">The maximum range to look for.</param>
         /// <returns>The index of the npc.</returns>
-        public static int FindTargetIgnoreCollision(this Projectile projectile, float maxRange = 800f)
+        public static int FindTargetIgnoreCollision(this Projectile projectile, float maxRange = 800f, bool ignoreiFrames = false)
         {
             float range = maxRange;
             int result = -1;
@@ -103,7 +103,7 @@ namespace Whipcackling.Common.Utilities
             {
                 NPC npc = Main.npc[i];
                 bool flag = npc.CanBeChasedBy(projectile);
-                if (projectile.localNPCImmunity[i] != 0)
+                if (projectile.localNPCImmunity[i] != 0 && !ignoreiFrames)
                 {
                     flag = false;
                 }

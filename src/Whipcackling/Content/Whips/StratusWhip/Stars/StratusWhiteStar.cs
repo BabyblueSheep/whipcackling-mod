@@ -103,12 +103,12 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
                 Main.spriteBatch.Draw(
                     texture: texture,
                     position: Projectile.Center - Main.screenPosition
-                    + 3f * new Vector2((float)Math.Sin(Main.GlobalTimeWrappedHourly * 1.5f + MathHelper.TwoPi * i / 4f), (float)Math.Cos(Main.GlobalTimeWrappedHourly * 1.5f + MathHelper.TwoPi * i / 4f)),
+                    + 3f * new Vector2(MathF.Sin(Main.GlobalTimeWrappedHourly * 1.5f + MathHelper.TwoPi * i / 4f), MathF.Cos(Main.GlobalTimeWrappedHourly * 1.5f + MathHelper.TwoPi * i / 4f)),
                     sourceRectangle: texture.Frame(),
                     color: new Color(1, 1f, 1f, 0.2f),
                     rotation: Projectile.rotation + MathHelper.PiOver2,
                     origin: texture.Size() * 0.5f,
-                    scale: Projectile.scale + 0.2f + (float)Math.Sin(Main.GlobalTimeWrappedHourly * 3f) * 0.2f,
+                    scale: Projectile.scale + 0.2f + MathF.Sin(Main.GlobalTimeWrappedHourly * 3f) * 0.2f,
                     effects: SpriteEffects.None,
                     layerDepth: 0);
             }
@@ -119,7 +119,7 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
                 color: new Color(1f, 1f, 1f, 0.5f),
                 rotation: Projectile.rotation + Main.rand.NextFloat(-0.12f, 0.12f) + MathHelper.PiOver2,
                 origin: texture.Size() * 0.5f,
-                scale: Projectile.scale + 0.25f + (float)Math.Sin(Main.GlobalTimeWrappedHourly * 3f) * 0.15f,
+                scale: Projectile.scale + 0.25f + MathF.Sin(Main.GlobalTimeWrappedHourly * 3f) * 0.15f,
                 effects: SpriteEffects.None,
                 layerDepth: 0);
 
@@ -130,7 +130,7 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
                 color: new Color(0.8f, 0.8f, 0.8f, 0.8f),
                 rotation: Projectile.rotation + Main.rand.NextFloat(-0.1f, 0.1f) + MathHelper.PiOver2,
                 origin: texture.Size() * 0.5f,
-                scale: Projectile.scale + (float)Math.Sin(Main.GlobalTimeWrappedHourly * 3f) * 0.1f,
+                scale: Projectile.scale + MathF.Sin(Main.GlobalTimeWrappedHourly * 3f) * 0.1f,
                 effects: SpriteEffects.None,
                 layerDepth: 0);
 

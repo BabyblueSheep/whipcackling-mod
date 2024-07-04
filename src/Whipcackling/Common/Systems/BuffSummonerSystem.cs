@@ -66,7 +66,7 @@ namespace Whipcackling.Common.Systems
                     if (Main.netMode != NetmodeID.Server)
                     {
                         Color color = ProvUtils.GetProjectileColor((int)(Main.dayTime ? Providence.BossMode.Day : Providence.BossMode.Night), 0);
-                        float power = Math.Min(npc.height / 100f, 3f);
+                        float power = MathF.Min(npc.height / 100f, 3f);
                         Vector2 position = new(Main.rand.NextFloat(npc.Left.X, npc.Right.X), Main.rand.NextFloat(npc.Top.Y, npc.Bottom.Y));
                         Particle particle = new FlameParticle(
                             position: position, 

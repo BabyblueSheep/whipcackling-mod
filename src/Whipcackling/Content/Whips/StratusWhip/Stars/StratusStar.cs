@@ -83,8 +83,8 @@ namespace Whipcackling.Content.Whips.StratusWhip.Stars
                 Projectile.velocity = Vector2.Zero;
 
                 Vector2 intendedPosition = target.Center;
-                intendedPosition.X += (float)Math.Sin(Timer * RotateSpeed + Offset) * Radius;
-                intendedPosition.Y += (float)Math.Cos(Timer * RotateSpeed + Offset) * Radius;
+                intendedPosition.X += MathF.Sin(Timer * RotateSpeed + Offset) * Radius;
+                intendedPosition.Y += MathF.Cos(Timer * RotateSpeed + Offset) * Radius;
 
                 if (Timer < 4f)
                 {

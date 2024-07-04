@@ -262,7 +262,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
                             new AngularVelocityMoveToTarget(angle, Projectile.Center.X, Projectile.Center.Y, 0.05f),
                             new RotationIsVelocity(),
                             new LinearScaleIncrease(-0.05f, -0.05f),
-                            new AlphaFadeInOut(5, 5, 120, 255, 255)
+                            new AlphaFadeInOut(5, 5, 120, 255, 255, 0)
                             );
                     }
                     else
@@ -363,8 +363,8 @@ namespace Whipcackling.Content.Whips.MeldWhip
 
             for (int i = 0; i < 129; i++)
             {
-                double rad = i / 128f * Math.PI * 2;
-                Vector2 offset = new((float)Math.Sin(rad), (float)Math.Cos(rad));
+                float rad = i / 128f * MathF.PI * 2;
+                Vector2 offset = new(MathF.Sin(rad), MathF.Cos(rad));
                 float radOffset = 1 + _noise.GetNoise(offset.X, offset.Y) * 0.1f;
 
                 positions[i] = Projectile.Center + offset * Size * 0.5f * radOffset * Easings.OutQuart(Utils.GetLerpValue(0, 20, Timer, true));
@@ -374,7 +374,7 @@ namespace Whipcackling.Content.Whips.MeldWhip
             rotations[0] = rotations[128];
 
             Color ShockwaveColor(float p) => Color.White;
-            float ShockwaveWidth(float p) => (8 + (float)Math.Pow(1.5f, Strength)) * Utils.GetLerpValue(20, 5, Timer, true) * Utils.GetLerpValue(0, 5, Timer, true);
+            float ShockwaveWidth(float p) => (8 + MathF.Pow(1.5f, Strength)) * Utils.GetLerpValue(20, 5, Timer, true) * Utils.GetLerpValue(0, 5, Timer, true);
 
             _strip.PrepareStrip(positions, rotations, ShockwaveColor, ShockwaveWidth, -Main.screenPosition, 129, true);
 
