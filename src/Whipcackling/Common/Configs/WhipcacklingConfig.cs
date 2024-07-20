@@ -20,5 +20,9 @@ namespace Whipcackling.Common.Configs
         [BackgroundColor(192, 54, 64, 192)]
         [DefaultValue(true)]
         public bool RemoveSummonerPenalty { get; set; }
+
+        [BackgroundColor(192, 54, 64, 192)]
+        [DefaultValue(true)]
+        public bool NewSummonPrefixes { get; set; }
     }
 }

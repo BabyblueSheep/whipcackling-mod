@@ -28,6 +28,16 @@ WhipcacklingConfig: {
 			This also affects whip tag damage values and certain values in minion projectiles.
 			'''
 	}
+
+	NewSummonPrefixes: {
+		Label: "[i:IronHammer] Enable New Summoner Modifiers"
+		Tooltip:
+			'''
+			Adds new modifiers to summoner weapons.
+			The new modifiers prevent mage modifiers from being rollable on summoner weapons.
+			The new modifiers can only be applied to minions and sentries, not whips.
+			'''
+	}
 }
 
 BalanceMode: {

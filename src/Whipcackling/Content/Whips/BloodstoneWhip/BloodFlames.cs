@@ -13,6 +13,7 @@ using Terraria.ModLoader;
 using Whipcackling.Core.Particles;
 using static Terraria.ModLoader.BackupIO;
 using Whipcackling.Core.Particles.Components;
+using Terraria.Graphics.Light;
 
 namespace Whipcackling.Content.Whips.BloodstoneWhip
 {
@@ -53,6 +54,8 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
             float frequency = Utils.Remap(Timer, 15, 45, 0, 1);
             byte alpha = (byte)(200 * frequency);
             byte color = (byte)(40 * frequency);
+
+            Lighting.AddLight(Projectile.Center, 1 * (frequency * 2), 0.4f * (frequency * 2), 0.3f * (frequency * 2));
 
             Vector2 velocity = Projectile.velocity.SafeNormalize(Vector2.Zero).RotatedByRandom(MathHelper.PiOver4) * 5f * frequency;
 

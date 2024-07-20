@@ -103,7 +103,7 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
 
             if (BreathTimer == 3)
             {
-                if (Timer % 3 == 0)
+                if (Timer % 3 != 0)
                     return;
                 int nearest = Projectile.FindTargetIgnoreCollision(1200, true);
                 if (nearest == -1)
@@ -114,6 +114,15 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
                 velocity *= 8;
 
                 Projectile.NewProjectile(Projectile.GetProjectileSource_FromThis(), Projectile.WhipPointsForCollision[^1], velocity, ModContent.ProjectileType<BloodFlames>(), (int)(Projectile.damage * 0.2f), 0.425f, Projectile.owner);
+
+                if (Timer % 4 == 0)
+                {
+                    SoundEngine.PlaySound(SoundID.DD2_BetsyFlameBreath with
+                    {
+                        MaxInstances = 0,
+                        PitchVariance = 0.5f
+                    }, Projectile.WhipPointsForCollision[^1]);
+                }
             }
         }
 

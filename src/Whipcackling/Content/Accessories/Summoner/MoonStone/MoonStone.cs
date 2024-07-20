@@ -211,6 +211,10 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
 
         public void ActionAttackClose(Projectile projectile, NPC target)
         {
+            Player owner = Main.player[projectile.owner];
+            if (Main.myPlayer != owner.whoAmI)
+                return;
+
             for (int i = 0; i < 2; i++)
             {
                 Vector2 finalVelocity = new Vector2(15, 0).RotatedByRandom(Math.PI * 2);
@@ -221,6 +225,10 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
 
         public void ActionAttackFarActive(Projectile projectile, NPC target)
         {
+            Player owner = Main.player[projectile.owner];
+            if (Main.myPlayer != owner.whoAmI)
+                return;
+
             for (int i = 0; i < 3; i++)
             {
                 Projectile.NewProjectile(projectile.GetProjectileSource_FromThis(), projectile.Center, new Vector2(3f, 0).RotatedByRandom(MathHelper.TwoPi), ModContent.ProjectileType<ExodiumBeam>(), (int)Math.Ceiling(projectile.damage * 0.5f), 0f, projectile.owner);
@@ -233,6 +241,9 @@ namespace Whipcackling.Content.Accessories.Summoner.MoonStone
             Projectile.NewProjectile(projectile.GetProjectileSource_FromThis(), projectile.Center, Vector2.Zero, ModContent.ProjectileType<ExodiumHeal>(), 0, 0, projectile.owner, 40, 190);
 
             Player owner = Main.player[projectile.owner];
+            if (Main.myPlayer != owner.whoAmI)
+                return;
+
             for (int i = 0; i < Main.player.Length; i++)
             {
                 Player player = Main.player[i];

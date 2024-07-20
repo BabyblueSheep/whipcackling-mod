@@ -1,13 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.UI;
 using Whipcackling.Assets;
@@ -16,6 +14,11 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
 {
     public class BloodstoneWhipPlayer : ModPlayer
     {
+        public static SoundStyle AwakenActivate = new($"{AssetDirectory.AssetPath}Sounds/Whips/BloodstoneWhip/AwakenActivate")
+        {
+            MaxInstances = 0,
+        };
+
         public static SoundStyle AwakenEnd = new($"{AssetDirectory.AssetPath}Sounds/Whips/BloodstoneWhip/AwakenEnd")
         {
             MaxInstances = 0,
@@ -24,23 +27,11 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
         public bool IsAwakened { get; set; }
         public float BloodCharge { get; set; }
 
-        public override bool PreItemCheck()
-        {
-            if (Player.HeldItem.type != ModContent.ItemType<BloodstoneWhip>())
-                return true;
-            if (Player.altFunctionUse != 2)
-                return true;
-
-            Player.itemTime = 0;
-            Player.itemAnimation = 0;
-            return false;
-        }
-
         public override void PostUpdateBuffs()
         {
             if (IsAwakened)
             {
-                BloodCharge -= 0.001f;
+                BloodCharge -= ConstantsBloodstone.ChargeLost;
 
                 if (BloodCharge <= 0)
                 {
@@ -51,8 +42,35 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
 
             BloodCharge = MathHelper.Clamp(BloodCharge, 0, 1);
         }
-    }
 
+        public override void SendClientChanges(ModPlayer clientPlayer)
+        {
+            BloodstoneWhipPlayer clone = (BloodstoneWhipPlayer)clientPlayer;
+
+            if (BloodCharge != clone.BloodCharge)
+                SyncPlayer(-1, Main.myPlayer, false);
+        }
+
+        public override void CopyClientState(ModPlayer targetCopy)
+        {
+            BloodstoneWhipPlayer clone = (BloodstoneWhipPlayer)targetCopy;
+            clone.BloodCharge = BloodCharge;
+        }
+
+        public override void SyncPlayer(int toWho, int fromWho, bool newPlayer)
+        {
+            ModPacket packet = Mod.GetPacket();
+            packet.Write((byte)WhipcacklingMod.MessageType.BloodstoneWhipSyncCharge);
+            packet.Write((byte)Player.whoAmI);
+            packet.Write(BloodCharge);
+            packet.Send(toWho, fromWho);
+        }
+
+        public void RecievePlayer(BinaryReader reader)
+        {
+            BloodCharge = reader.ReadSingle();
+        }
+    }
     public class BloodstoneWhipBarSystem : ModSystem
     {
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)

@@ -32,10 +32,16 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
         //The additive tag damage of the whip.
         public static int TagDamage => 30;
 
-        // The critical strike chance of the tag debuff.
+        //The critical strike chance of the tag debuff.
         public static int TagCritChance => 10;
 
         //The duration of the normal tag debuff.
         public static int TagDuration => 60 * 4;
+
+        //Amount of charge gained when a minion hits a tagged enemy.
+        public static float ChargeGained => 0.1f;//0.005f;
+
+        //Amount of charge lost when in an awakened state.
+        public static float ChargeLost => 0.005f;//0.001f;
     }
 }

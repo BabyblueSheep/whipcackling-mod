@@ -10,7 +10,6 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Whipcackling.Assets;
-using Whipcackling.Content.Enchantments;
 
 namespace Whipcackling.Common.Systems.Drawing
 {

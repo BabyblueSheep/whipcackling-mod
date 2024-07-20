@@ -44,8 +44,8 @@ namespace Whipcackling.Content.Whips.BloodstoneWhip
             }
 
             BloodstoneWhipPlayer modPlayer = Main.player[projectile.owner].GetModPlayer<BloodstoneWhipPlayer>();
-            float multiplier = modPlayer.IsAwakened ? 0.4f : 1f;
-            modPlayer.BloodCharge += 0.005f * projTagMultiplier * multiplier;
+            float multiplier = modPlayer.IsAwakened ? 0f : 1f;
+            modPlayer.BloodCharge += ConstantsBloodstone.ChargeGained * projTagMultiplier * multiplier;
         }
     }
 }

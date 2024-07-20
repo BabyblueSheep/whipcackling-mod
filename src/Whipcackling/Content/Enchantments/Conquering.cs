@@ -1,4 +1,4 @@
-﻿using CalamityMod;
+﻿/*using CalamityMod;
 using MonoMod.Cil;
 using System;
 using System.IO;
@@ -156,3 +156,4 @@ namespace Whipcackling.Content.Enchantments
         }
     }
 }
+*/

@@ -6,8 +6,6 @@ Enchantments: {
 	}
 }
 
-Keybinds.ExpandTooltip.DisplayName: Expand Tooltip
-
 Projectiles: {
 	StratusRedStar.DisplayName: Stratus Red Star
 	StratusYellowStarMini.DisplayName: Stratus Yellow Star Mini
@@ -21,3 +19,26 @@ Items: {
 		Tooltip: ""
 	}
 }
+
+Prefixes: {
+	Effects: {
+		TagDamage: "{0}% summon tag damage"
+		Speed: "{0}% minion movement speed"
+		Knockback: "{0}% minion knockback"
+		CriticalChance: "{0}% critical strike chance"
+		Slots: "{0}% slot usage"
+	}
+
+	CrazedSummonerPrefix.DisplayName: Crazed
+	CowardlySummonerPrefix.DisplayName: Cowardly
+	BloodthirstySummonerPrefix.DisplayName: Bloodthirsty
+	CommandingSummonerPrefix.DisplayName: Commanding
+	EfficientSummonerPrefix.DisplayName: Efficient
+	StrikingSummonerPrefix.DisplayName: Striking
+	SwarmingSummonerPrefix.DisplayName: Swarming
+	UnstableSummonerPrefix.DisplayName: Unstable
+	CooperativeSummonerPrefix.DisplayName: Cooperative
+	WatchingSummonerPrefix.DisplayName: Watching
+}
+
+Keybinds.ExpandTooltip.DisplayName: Expand Tooltip
